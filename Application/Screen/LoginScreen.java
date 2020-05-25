@@ -65,7 +65,7 @@ public class LoginScreen {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setBackground(new Color(colors.getSecondary().getRGB() + 20));
+                button.setBackground(new Color(colors.getSecondary().getRGB() + 50));
             }
 
             @Override

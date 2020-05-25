@@ -1,8 +1,6 @@
 package Application;
 
 import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
 
 import Application.Routes.Routes;
 import Application.Screen.LoginScreen;
@@ -10,7 +8,11 @@ import Application.Screen.LoginScreen;
 public class Main {
     private static JFrame window = new JFrame();
 
-    public static void main(String[] args) throws InterruptedException, FontFormatException, IOException {
+    public static JFrame getWindow() {
+        return window;
+    }
+
+    public static void main(String[] args) throws InterruptedException {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setTitle("My Study");
 
