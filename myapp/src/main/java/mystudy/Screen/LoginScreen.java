@@ -7,8 +7,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.*;
 
+import org.hibernate.Session;
+
 import mystudy.Colors.Colors;
 import mystudy.Fonts.Fonts;
+import mystudy.Hibernate.HibernateUtil;
+import mystudy.User.User;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -36,43 +40,6 @@ public class LoginScreen {
         button.setBackground(colors.getSecondary());
         button.setAlignmentX(Component.LEFT_ALIGNMENT);
         button.setMaximumSize(new Dimension(260, 50));
-        button.addMouseListener(new MouseInputListener() {
-
-            @Override
-            public void mouseMoved(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseDragged(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                button.setBackground(colors.getSecondary());
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                button.setBackground(colors.getAccentColor());
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                button.setBackground(colors.getSecondary());
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                button.setBackground(new Color(colors.getSecondary().getRGB() + 50));
-            }
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-
-            }
-        });
 
         JPanel login = new JPanel();
 
@@ -122,6 +89,49 @@ public class LoginScreen {
 
         panel.add(login);
         screenPanel.add(panel);
+        button.addMouseListener(new MouseInputListener() {
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                button.setBackground(colors.getSecondary());
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                button.setBackground(colors.getAccentColor());
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(colors.getSecondary());
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(new Color(colors.getSecondary().getRGB() + 50));
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Session session = HibernateUtil.getSessionFactory().openSession();
+                User user = (User) session.get(User.class, usernameTextField.getText());
+                System.out.println(user.getUsername());
+                System.out.println(user.getPassword());
+                System.out.println(user.getPermission());
+            }
+        });
+
         return screenPanel;
     }
 

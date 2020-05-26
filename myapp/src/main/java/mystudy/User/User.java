@@ -1,8 +1,31 @@
 package mystudy.User;
 
-public class User {
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "users")
+public class User implements Serializable {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 4859206593107291357L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "username")
     private String Username;
+
+    @Column(name = "password")
     private String Password;
+
+    @Column(name = "permission")
     private Permission permission;
 
     public User() {
@@ -36,21 +59,6 @@ public class User {
 
     public void setPermission(Permission permission) {
         this.permission = permission;
-    }
-
-    public User Username(String Username) {
-        this.Username = Username;
-        return this;
-    }
-
-    public User Password(String Password) {
-        this.Password = Password;
-        return this;
-    }
-
-    public User permission(Permission permission) {
-        this.permission = permission;
-        return this;
     }
 
 }
