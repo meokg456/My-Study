@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.swing.*;
 
+import mystudy.Main;
+
 public class Routes {
     private static Routes instance;
 
@@ -22,13 +24,14 @@ public class Routes {
         return routes;
     }
 
-    public void route(JFrame window, String routeName) throws InterruptedException {
+    public void route(String routeName) {
+        JFrame window = Main.getWindow();
         Container pane = window.getContentPane();
-        pane.removeAll();
         pane.setLayout(new BorderLayout());
+        pane.removeAll();
+
         pane.add(routes.get(routeName), BorderLayout.CENTER);
+        window.validate();
         window.repaint();
-        window.pack();
-        window.setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 }

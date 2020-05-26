@@ -1,81 +1,55 @@
 package mystudy.Screen;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
+
 import javax.swing.event.*;
 
 import org.hibernate.Session;
 
 import mystudy.Colors.Colors;
+import mystudy.Components.RoundedButton;
+import mystudy.Components.CardPanel;
+import mystudy.Components.MyPasswordField;
+import mystudy.Components.MyTextField;
 import mystudy.Fonts.Fonts;
 import mystudy.Hibernate.HibernateUtil;
+import mystudy.Routes.Routes;
 import mystudy.User.User;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public class LoginScreen {
-    static Colors colors = Colors.getInstance();
 
     public static JPanel build() {
         JPanel screenPanel = new JPanel();
         JPanel panel = new JPanel();
         screenPanel.setLayout(new BoxLayout(screenPanel, BoxLayout.PAGE_AXIS));
-        System.out.println();
         screenPanel.add(Box.createRigidArea(
                 new Dimension(0, (int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 800) / 2)));
         panel.setLayout(new FlowLayout(FlowLayout.CENTER));
         panel.setOpaque(false);
-        screenPanel.setBackground(colors.getBackground());
+        screenPanel.setBackground(Colors.getBackground());
+        panel.setBackground(Colors.getBackground());
 
-        JPanel button = new JPanel();
-        button.setLayout(new BorderLayout());
-        JLabel buttonLabel = new JLabel("Login");
-        buttonLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        button.add(buttonLabel, BorderLayout.CENTER);
-        buttonLabel.setFont(new Font(Fonts.getInstance().getFont().getName(), Font.PLAIN, 18));
-        button.setBackground(colors.getSecondary());
-        button.setAlignmentX(Component.LEFT_ALIGNMENT);
+        RoundedButton button = new RoundedButton("Login", 30, 24);
         button.setMaximumSize(new Dimension(260, 50));
 
-        JPanel login = new JPanel();
+        JPanel login = new CardPanel(30);
 
         JLabel label = new JLabel("Login");
-        label.setForeground(colors.getTextColor());
-        label.setFont(new Font(Fonts.getInstance().getFont().getName(), Font.PLAIN, 64));
+        label.setForeground(Colors.getTextColor());
+        label.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 64));
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JPanel username = new JPanel();
-        username.setOpaque(false);
-
-        Border blackline = BorderFactory.createLineBorder(Color.black);
-        TitledBorder usernameBorder = BorderFactory.createTitledBorder(blackline, "Username");
-        usernameBorder.setTitleFont(new Font(Fonts.getInstance().getFont().getName(), Font.PLAIN, 36));
-        usernameBorder.setTitleColor(colors.getTextColor());
-        username.setBorder(new CompoundBorder(usernameBorder, new EmptyBorder(5, 5, 5, 5)));
-        username.setLayout(new BorderLayout());
-        JTextField usernameTextField = new JTextField();
-        usernameTextField.setFont(new Font(Fonts.getInstance().getFont().getName(), Font.PLAIN, 36));
-        username.add(usernameTextField, BorderLayout.CENTER);
+        MyTextField username = new MyTextField("Username");
         username.setMaximumSize(new Dimension(530, 120));
 
-        JPanel password = new JPanel();
-        password.setOpaque(false);
+        MyPasswordField password = new MyPasswordField();
 
-        TitledBorder passwordBorder = BorderFactory.createTitledBorder(blackline, "Password");
-        passwordBorder.setTitleFont(new Font(Fonts.getInstance().getFont().getName(), Font.PLAIN, 36));
-        passwordBorder.setTitleColor(colors.getTextColor());
-        password.setBorder(new CompoundBorder(passwordBorder, new EmptyBorder(5, 5, 5, 5)));
-        password.setLayout(new BorderLayout());
-        JPasswordField passwordTextField = new JPasswordField();
-        passwordTextField.setFont(new Font(Fonts.getInstance().getFont().getName(), Font.PLAIN, 36));
-        password.add(passwordTextField, BorderLayout.CENTER);
         password.setMaximumSize(new Dimension(530, 120));
 
-        login.setBackground(colors.getPrimary());
+        login.setBackground(Colors.getPrimary());
         login.setPreferredSize(new Dimension(600, 800));
         login.setLayout(new BoxLayout(login, BoxLayout.Y_AXIS));
 
@@ -103,32 +77,34 @@ public class LoginScreen {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                button.setBackground(colors.getSecondary());
-
+                button.setBackground(Colors.getSecondary());
+                Session session = HibernateUtil.getSessionFactory().openSession();
+                User user = (User) session.get(User.class, username.getText());
+                System.out.println("Login in with " + user.getUsername());
+                if (user.getPassword().equals(password.getPassword())) {
+                    System.out.println("Password is correct");
+                    Routes.getInstance().route("Dashboard");
+                }
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
-                button.setBackground(colors.getAccentColor());
+                button.setBackground(Colors.getAccentColor());
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                button.setBackground(colors.getSecondary());
+                button.setBackground(Colors.getSecondary());
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setBackground(new Color(colors.getSecondary().getRGB() + 50));
+                button.setBackground(new Color(Colors.getSecondary().getRGB() + 50));
             }
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                Session session = HibernateUtil.getSessionFactory().openSession();
-                User user = (User) session.get(User.class, usernameTextField.getText());
-                System.out.println(user.getUsername());
-                System.out.println(user.getPassword());
-                System.out.println(user.getPermission());
+
             }
         });
 
