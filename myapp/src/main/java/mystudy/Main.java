@@ -1,6 +1,8 @@
 package mystudy;
 
 import javax.swing.*;
+
+import mystudy.Connector.DatabaseService;
 import mystudy.Routes.Routes;
 import mystudy.Screen.DashboardScreen;
 import mystudy.Screen.LoginScreen;
@@ -13,6 +15,8 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        DatabaseService.init();
+
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setTitle("My Study");
 

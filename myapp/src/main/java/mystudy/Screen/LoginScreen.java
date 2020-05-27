@@ -6,11 +6,11 @@ import org.hibernate.Session;
 
 import mystudy.Colors.Colors;
 import mystudy.Components.RoundedButton;
+import mystudy.Connector.DatabaseService;
 import mystudy.Components.CardPanel;
 import mystudy.Components.MyPasswordField;
 import mystudy.Components.MyTextField;
 import mystudy.Fonts.Fonts;
-import mystudy.Hibernate.HibernateUtil;
 import mystudy.Routes.Routes;
 import mystudy.User.User;
 import mystudy.User.UserService;
@@ -21,7 +21,7 @@ import java.awt.event.MouseEvent;
 public class LoginScreen implements Screen {
 
     public JPanel build() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = DatabaseService.getInstance().getSession();
         JPanel screenPanel = new JPanel();
         screenPanel.setLayout(new GridBagLayout());
 

@@ -8,10 +8,14 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
 import mystudy.Colors.Colors;
 import mystudy.Components.MyPasswordField;
 import mystudy.Components.RoundedBorder;
 import mystudy.Components.RoundedButton;
+import mystudy.Connector.DatabaseService;
 import mystudy.Fonts.Fonts;
 import mystudy.Routes.Routes;
 import mystudy.User.User;
@@ -134,6 +138,31 @@ public class AccountFragment extends JPanel {
             @Override
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
+                if (!user.getPassword().equals(oldPasswordField.getPassword())) {
+                    JOptionPane.showMessageDialog(null, "Old password is not correct!", "Invalid",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (!newPasswordField.getPassword().equals(confirmNewPasswordField.getPassword())) {
+                    JOptionPane.showMessageDialog(null, "New password and confirm new password does not match",
+                            "Invalid", JOptionPane.ERROR_MESSAGE);
+                    return;
+                } else {
+                    user.setPassword(newPasswordField.getPassword());
+                    Transaction transaction;
+
+                    Session session = DatabaseService.getInstance().getSession();
+                    transaction = session.beginTransaction();
+                    session.update(user);
+                    transaction.commit();
+                    JOptionPane.showMessageDialog(null, "Password has been changed!", "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+
+                    changePasswordPanel.removeAll();
+                    buildProfileFragment();
+                    changePasswordPanel.validate();
+                    changePasswordPanel.repaint();
+                }
 
             }
         };
