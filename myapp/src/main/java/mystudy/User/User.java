@@ -28,37 +28,72 @@ public class User implements Serializable {
     @Column(name = "permission")
     private Permission permission;
 
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "gender")
+    private Gender gender;
+
+    @Column(name = "CMND")
+    private String id;
+
     public User() {
     }
 
-    public User(String Username, String Password, Permission permission) {
+    public User(String Username, String Password, Permission permission, String name, Gender gender, String id) {
         this.Username = Username;
         this.Password = Password;
         this.permission = permission;
+        this.name = name;
+        this.gender = gender;
+        this.id = id;
     }
 
-    public String getUsername() {
-        return this.Username;
+    public String getName() {
+        return this.name;
     }
 
-    public void setUsername(String Username) {
-        this.Username = Username;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Gender getGender() {
+        return this.gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public String getId() {
+        return this.id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getPassword() {
-        return this.Password;
-    }
-
-    public void setPassword(String Password) {
-        this.Password = Password;
+        return Password;
     }
 
     public Permission getPermission() {
-        return this.permission;
+        return permission;
+    }
+
+    public String getUsername() {
+        return Username;
+    }
+
+    public void setPassword(String password) {
+        Password = password;
     }
 
     public void setPermission(Permission permission) {
         this.permission = permission;
     }
 
+    public void setUsername(String username) {
+        Username = username;
+    }
 }

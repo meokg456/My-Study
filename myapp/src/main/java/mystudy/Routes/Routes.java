@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.swing.*;
 
 import mystudy.Main;
+import mystudy.Screen.Screen;
 
 public class Routes {
     private static Routes instance;
@@ -18,9 +19,9 @@ public class Routes {
         return instance;
     }
 
-    private Map<String, JPanel> routes = new HashMap<>();
+    private Map<String, Screen> routes = new HashMap<>();
 
-    public Map<String, JPanel> getRoutes() {
+    public Map<String, Screen> getRoutes() {
         return routes;
     }
 
@@ -30,7 +31,7 @@ public class Routes {
         pane.setLayout(new BorderLayout());
         pane.removeAll();
 
-        pane.add(routes.get(routeName), BorderLayout.CENTER);
+        pane.add(routes.get(routeName).build(), BorderLayout.CENTER);
         window.validate();
         window.repaint();
     }

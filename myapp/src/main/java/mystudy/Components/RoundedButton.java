@@ -1,12 +1,14 @@
 package mystudy.Components;
 
 import javax.swing.*;
+import javax.swing.event.MouseInputListener;
 
 import mystudy.Colors.Colors;
 import mystudy.Fonts.Fonts;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 
-public class RoundedButton extends JPanel {
+public class RoundedButton extends JPanel implements MouseInputListener {
 
     /**
      *
@@ -34,11 +36,46 @@ public class RoundedButton extends JPanel {
         Graphics2D graphics = (Graphics2D) g;
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         Component parent = getParent();
-
-        graphics.setColor(parent.getBackground());
+        if (parent != null)
+            graphics.setColor(parent.getBackground());
         graphics.fillRect(0, 0, width, height); // paint background
         graphics.setColor(getBackground());
         graphics.fillRoundRect(0, 0, width, height, arcs.width, arcs.height); // paint background
+        addMouseListener(this);
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        setBackground(Colors.getSecondary());
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        setBackground(Colors.getSecondary().darker());
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        setBackground(Colors.getSecondary());
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        setBackground(Colors.getSecondary().brighter());
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
 
     }
 }

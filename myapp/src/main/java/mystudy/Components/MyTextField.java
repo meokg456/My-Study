@@ -13,23 +13,23 @@ public class MyTextField extends JPanel {
      *
      */
     private static final long serialVersionUID = 1L;
-    JTextField usernameTextField;
+    JTextField textField;
 
-    public MyTextField(String title) {
+    public MyTextField(String title, Color color, int fontSize) {
         setOpaque(false);
-        RoundedBorder line = new RoundedBorder(Color.white, 1, true, 30);
-        TitledBorder usernameBorder = BorderFactory.createTitledBorder(line, title);
-        usernameBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 36));
-        usernameBorder.setTitleColor(Colors.getTextColor());
-        setBorder(new CompoundBorder(usernameBorder, new EmptyBorder(5, 10, 12, 10)));
+        RoundedBorder line = new RoundedBorder(color, 1, true, 30);
+        TitledBorder border = BorderFactory.createTitledBorder(line, title);
+        border.setTitleFont(new Font(Fonts.getFont().getName(), Font.PLAIN, fontSize));
+        border.setTitleColor(Colors.getTextColor());
+        setBorder(new CompoundBorder(border, new EmptyBorder(5, 10, 12, 10)));
         setLayout(new BorderLayout());
-        usernameTextField = new JTextField();
-        usernameTextField.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 28));
-        add(usernameTextField, BorderLayout.CENTER);
+        textField = new JTextField();
+        textField.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 28));
+        add(textField, BorderLayout.CENTER);
     }
 
     public String getText() {
-        return usernameTextField.getText();
+        return textField.getText();
     }
 
 }
