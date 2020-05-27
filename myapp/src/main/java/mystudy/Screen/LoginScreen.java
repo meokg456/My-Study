@@ -21,6 +21,7 @@ import java.awt.event.MouseEvent;
 public class LoginScreen implements Screen {
 
     public JPanel build() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
         JPanel screenPanel = new JPanel();
         screenPanel.setLayout(new GridBagLayout());
 
@@ -58,17 +59,31 @@ public class LoginScreen implements Screen {
             private static final long serialVersionUID = 1L;
 
             @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+
+            }
+
+            @Override
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
                 setBackground(Colors.getSecondary());
-                Session session = HibernateUtil.getSessionFactory().openSession();
+
                 User user = (User) session.get(User.class, username.getText());
+                if (user == null) {
+                    JOptionPane.showMessageDialog(null, "Your username is not existed", "Invalid username",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 if (user.getPassword().equals(password.getPassword())) {
                     System.out.println("Login in with " + user.getUsername());
                     UserService.getInstance().setLoggedUser(user);
                     Routes.getInstance().route("Dashboard");
                     password.setPassword("");
 
+                } else {
+                    JOptionPane.showMessageDialog(null, "Your password is wrong", "Invalid password",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         };
