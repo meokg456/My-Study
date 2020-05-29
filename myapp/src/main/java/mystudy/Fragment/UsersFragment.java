@@ -1,11 +1,21 @@
 package mystudy.Fragment;
 
-import java.util.List;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
-import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.hibernate.HibernateException;
@@ -17,11 +27,10 @@ import mystudy.Components.CardPanel;
 import mystudy.Components.MyTable;
 import mystudy.Components.RoundedBorder;
 import mystudy.Components.RoundedButton;
+import mystudy.Components.Table.UserAccountListModel;
 import mystudy.Connector.DatabaseService;
 import mystudy.Fonts.Fonts;
-import mystudy.POJOs.*;
-
-import mystudy.Table.UserAccountListModel;
+import mystudy.POJOs.User;
 
 public class UsersFragment extends JPanel {
 
@@ -36,7 +45,7 @@ public class UsersFragment extends JPanel {
         List<User> users = session.createQuery("from User", User.class).list();
         UserAccountListModel userAccountListModel = new UserAccountListModel(users);
         setBackground(Colors.getBackground());
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(0, 20));
         TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30), "Users");
         titledBorder.setTitleJustification(TitledBorder.CENTER);
         titledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 36));
@@ -72,13 +81,13 @@ public class UsersFragment extends JPanel {
                 }
             }
         };
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        add(bottomPanel, BorderLayout.PAGE_END);
         resetButton.setEnabled(false);
         resetButton.setPreferredSize(new Dimension(200, 50));
-        topPanel.add(resetButton);
+        bottomPanel.add(resetButton);
 
-        add(topPanel, BorderLayout.PAGE_START);
-        topPanel.setBackground(topPanel.getParent().getBackground());
+        bottomPanel.setBackground(bottomPanel.getParent().getBackground());
         // Hiển thị thông tin giáo vụ
 
         CardPanel centerJPanel = new CardPanel(50);
@@ -118,5 +127,6 @@ public class UsersFragment extends JPanel {
         accountTable.setRowHeight(50);
         JScrollPane scrollPane = new JScrollPane(accountTable);
         centerJPanel.add(scrollPane);
+
     }
 }

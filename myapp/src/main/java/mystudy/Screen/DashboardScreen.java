@@ -14,6 +14,7 @@ import mystudy.Components.TabItem;
 import mystudy.Enum.Permission;
 import mystudy.Fonts.Fonts;
 import mystudy.Fragment.AccountFragment;
+import mystudy.Fragment.StudentsFragment;
 import mystudy.Fragment.UsersFragment;
 import mystudy.User.UserService;
 
@@ -46,16 +47,24 @@ public class DashboardScreen implements Screen, MouseInputListener {
 
         AccountFragment accountFragment = new AccountFragment();
         UsersFragment userFragment = new UsersFragment();
+        StudentsFragment studentsFragment = new StudentsFragment();
         TabItem accountTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/man.png"), "Account");
         accountTabItem.addMouseListener(this);
         accountTabItem.setMaximumSize(new Dimension(390, 50));
 
-        TabItem usersTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/users.png"), "Users");
+        TabItem studentsTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/student.png"),
+                "Student");
+        studentsTabItem.addMouseListener(this);
+        studentsTabItem.setMaximumSize(new Dimension(390, 50));
+
+        TabItem usersTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/users.png"), "User");
         usersTabItem.addMouseListener(this);
         usersTabItem.setMaximumSize(new Dimension(390, 50));
 
-        if (UserService.getInstance().getLoggedUser().getPermission().equals(Permission.ADMIN))
+        if (UserService.getInstance().getLoggedUser().getPermission().equals(Permission.ADMIN)) {
+            tabItems.put(studentsTabItem, studentsFragment);
             tabItems.put(usersTabItem, userFragment);
+        }
         tabItems.put(accountTabItem, accountFragment);
 
         for (JPanel tabItem : tabItems.keySet()) {

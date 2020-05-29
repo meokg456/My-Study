@@ -28,4 +28,8 @@ public class Class {
         this.className = className;
     }
 
+    @Override
+    public String toString() {
+        return this.className;
+    }
 }

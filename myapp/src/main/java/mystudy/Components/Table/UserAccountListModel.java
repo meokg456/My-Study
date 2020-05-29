@@ -1,4 +1,4 @@
-package mystudy.Table;
+package mystudy.Components.Table;
 
 import java.util.List;
 
