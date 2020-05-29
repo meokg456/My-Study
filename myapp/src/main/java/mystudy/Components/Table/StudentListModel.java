@@ -13,7 +13,7 @@ public class StudentListModel extends AbstractTableModel {
      */
     private static final long serialVersionUID = 1L;
 
-    private String[] columnNames = { "Student ID", "Full name", "Gender", "Personal ID" };
+    private String[] columnNames = { "No.", "Student ID", "Full name", "Gender", "Personal ID" };
 
     private List<Student> list;
 
@@ -41,12 +41,14 @@ public class StudentListModel extends AbstractTableModel {
         Student student = list.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                return student.getStudentId();
+                return rowIndex;
             case 1:
-                return student.getName();
+                return student.getStudentId();
             case 2:
-                return student.getGender();
+                return student.getName();
             case 3:
+                return student.getGender();
+            case 4:
                 return student.getPersonalId();
 
         }

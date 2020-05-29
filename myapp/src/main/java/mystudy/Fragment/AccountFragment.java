@@ -33,7 +33,7 @@ import mystudy.POJOs.Class;
 import mystudy.Routes.Routes;
 import mystudy.User.UserService;
 
-public class AccountFragment extends JPanel {
+public class AccountFragment extends JPanel implements Fragment {
 
     private User user = UserService.getInstance().getLoggedUser();
 
@@ -42,8 +42,19 @@ public class AccountFragment extends JPanel {
      */
     private static final long serialVersionUID = 1L;
 
+    public JPanel getPanel() {
+        return this;
+    }
+
     public AccountFragment() {
-        buildProfileFragment();
+        setBackground(Colors.getBackground());
+        setLayout(new BorderLayout());
+        TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30), "Profile");
+        titledBorder.setTitleJustification(TitledBorder.CENTER);
+        titledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 36));
+        titledBorder.setTitleColor(Colors.getTextColor());
+        setBorder(new CompoundBorder(new EmptyBorder(150, 100, 50, 50),
+                (new CompoundBorder(titledBorder, new EmptyBorder(30, 30, 30, 30)))));
     }
 
     private JPanel buildStudentProfile(Student student) {
@@ -107,19 +118,11 @@ public class AccountFragment extends JPanel {
         return centerJPanel;
     }
 
-    private void buildProfileFragment() {
+    public void build() {
+        removeAll();
         Student student = new Student("1712368", "Nguyễn Hữu Dũng", "Nam", "123456789", new Class("17CTT3"));
         // Student student = user.getStudent();
         JPanel accountPanel = this;
-
-        setBackground(Colors.getBackground());
-        setLayout(new BorderLayout());
-        TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30), "Profile");
-        titledBorder.setTitleJustification(TitledBorder.CENTER);
-        titledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 36));
-        titledBorder.setTitleColor(Colors.getTextColor());
-        setBorder(new CompoundBorder(new EmptyBorder(150, 100, 50, 50),
-                (new CompoundBorder(titledBorder, new EmptyBorder(30, 30, 30, 30)))));
 
         if (user.getPermission().equals(Permission.STUDENT)) {
             // Hiển thị thông tin sinh viên
@@ -230,7 +233,7 @@ public class AccountFragment extends JPanel {
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
                 changePasswordPanel.removeAll();
-                buildProfileFragment();
+                build();
                 changePasswordPanel.validate();
                 changePasswordPanel.repaint();
             }
@@ -270,7 +273,7 @@ public class AccountFragment extends JPanel {
                             JOptionPane.INFORMATION_MESSAGE);
 
                     changePasswordPanel.removeAll();
-                    buildProfileFragment();
+                    build();
                     changePasswordPanel.validate();
                     changePasswordPanel.repaint();
                 }

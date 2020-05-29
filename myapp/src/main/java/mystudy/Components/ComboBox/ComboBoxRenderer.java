@@ -34,7 +34,8 @@ public class ComboBoxRenderer extends JLabel implements ListCellRenderer<Object>
             setForeground(list.getForeground());
         }
         Class myClass = (Class) value;
-        setText(myClass.getClassName());
+        if (myClass != null)
+            setText(myClass.getClassName());
 
         return this;
     }

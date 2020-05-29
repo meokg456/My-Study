@@ -14,6 +14,7 @@ import mystudy.Components.TabItem;
 import mystudy.Enum.Permission;
 import mystudy.Fonts.Fonts;
 import mystudy.Fragment.AccountFragment;
+import mystudy.Fragment.Fragment;
 import mystudy.Fragment.StudentsFragment;
 import mystudy.Fragment.UsersFragment;
 import mystudy.User.UserService;
@@ -21,7 +22,7 @@ import mystudy.User.UserService;
 public class DashboardScreen implements Screen, MouseInputListener {
 
     private TabItem selectedTabItem = null;
-    private Map<JPanel, JPanel> tabItems = new LinkedHashMap<>();
+    private Map<JPanel, Fragment> tabItems = new LinkedHashMap<>();
     private JPanel pane = new JPanel();
 
     public JPanel build() {
@@ -92,11 +93,12 @@ public class DashboardScreen implements Screen, MouseInputListener {
     public void mouseReleased(MouseEvent e) {
         if (selectedTabItem != null) {
             selectedTabItem.setBackground(selectedTabItem.getParent().getBackground());
-            pane.remove(tabItems.get(selectedTabItem));
+            pane.remove(tabItems.get(selectedTabItem).getPanel());
         }
 
         selectedTabItem = (TabItem) e.getComponent();
-        pane.add(tabItems.get(selectedTabItem), BorderLayout.CENTER);
+        pane.add(tabItems.get(selectedTabItem).getPanel(), BorderLayout.CENTER);
+        tabItems.get(selectedTabItem).build();
         pane.validate();
         pane.repaint();
     }

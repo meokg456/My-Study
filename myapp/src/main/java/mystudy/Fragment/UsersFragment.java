@@ -32,7 +32,7 @@ import mystudy.Connector.DatabaseService;
 import mystudy.Fonts.Fonts;
 import mystudy.POJOs.User;
 
-public class UsersFragment extends JPanel {
+public class UsersFragment extends JPanel implements Fragment {
 
     private int selectedIndex = -1;
     /**
@@ -40,10 +40,11 @@ public class UsersFragment extends JPanel {
      */
     private static final long serialVersionUID = 1L;
 
+    public JPanel getPanel() {
+        return this;
+    }
+
     public UsersFragment() {
-        Session session = DatabaseService.getInstance().getSession();
-        List<User> users = session.createQuery("from User", User.class).list();
-        UserAccountListModel userAccountListModel = new UserAccountListModel(users);
         setBackground(Colors.getBackground());
         setLayout(new BorderLayout(0, 20));
         TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30), "Users");
@@ -52,6 +53,13 @@ public class UsersFragment extends JPanel {
         titledBorder.setTitleColor(Colors.getTextColor());
         setBorder(new CompoundBorder(new EmptyBorder(150, 100, 50, 50),
                 (new CompoundBorder(titledBorder, new EmptyBorder(30, 30, 30, 30)))));
+    }
+
+    public void build() {
+        removeAll();
+        Session session = DatabaseService.getInstance().getSession();
+        List<User> users = session.createQuery("from User", User.class).list();
+        UserAccountListModel userAccountListModel = new UserAccountListModel(users);
 
         RoundedButton resetButton = new RoundedButton("Reset Password", 50, 24) {
             /**
