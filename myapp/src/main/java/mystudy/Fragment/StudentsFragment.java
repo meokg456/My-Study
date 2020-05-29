@@ -60,6 +60,13 @@ public class StudentsFragment extends JPanel implements Fragment {
 
     public StudentsFragment() {
         setBackground(Colors.getBackground());
+
+
+    }
+
+    public void build() {
+        Session session = DatabaseService.getInstance().getSession();
+        removeAll();
         setLayout(new BorderLayout(0, 20));
         TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30), "Students");
         titledBorder.setTitleJustification(TitledBorder.CENTER);
@@ -67,11 +74,6 @@ public class StudentsFragment extends JPanel implements Fragment {
         titledBorder.setTitleColor(Colors.getTextColor());
         setBorder(new CompoundBorder(new EmptyBorder(150, 100, 50, 50),
                 (new CompoundBorder(titledBorder, new EmptyBorder(30, 30, 30, 30)))));
-    }
-
-    public void build() {
-        Session session = DatabaseService.getInstance().getSession();
-        removeAll();
         List<Student> students = new ArrayList<>();
         Vector<Class> classes = new Vector<>();
         classes.addAll(session.createQuery("from Class c ORDER BY c.className", Class.class).list());
@@ -81,6 +83,19 @@ public class StudentsFragment extends JPanel implements Fragment {
         JPanel topPanel = new JPanel(new BorderLayout());
         add(topPanel, BorderLayout.PAGE_START);
         topPanel.setBackground(topPanel.getParent().getBackground());
+        RoundedButton addButton = new RoundedButton("Add student", 50, 24) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                super.mouseReleased(e);
+            }
+        };
+        addButton.setPreferredSize(new Dimension(200, 50));
+        addButton.setEnabled(false);
 
         JComboBox<Class> classesComboBox = new JComboBox<Class>(classes);
         topPanel.add(classesComboBox, BorderLayout.LINE_START);
@@ -96,6 +111,9 @@ public class StudentsFragment extends JPanel implements Fragment {
         query.setParameter("class", selectedClass);
         students.addAll(query.list());
         model.fireTableDataChanged();
+        if (classesComboBox.getSelectedItem() != null) {
+            addButton.setEnabled(true);
+        }
 
         classesComboBox.addActionListener(new ActionListener() {
 
@@ -108,6 +126,7 @@ public class StudentsFragment extends JPanel implements Fragment {
                 query.setParameter("class", selectedClass);
                 students.addAll(query.list());
                 model.fireTableDataChanged();
+                addButton.setEnabled(true);
             }
 
         });
@@ -165,23 +184,12 @@ public class StudentsFragment extends JPanel implements Fragment {
             }
         };
         topPanel.add(importButton, BorderLayout.LINE_END);
-        importButton.setPreferredSize(new Dimension(200, 50));
-        RoundedButton resetButton = new RoundedButton("Add student", 50, 24) {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                super.mouseReleased(e);
-            }
-        };
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         add(bottomPanel, BorderLayout.PAGE_END);
-        resetButton.setPreferredSize(new Dimension(200, 50));
-        bottomPanel.add(resetButton);
 
+        importButton.setPreferredSize(new Dimension(200, 50));
+
+        bottomPanel.add(addButton);
         bottomPanel.setBackground(bottomPanel.getParent().getBackground());
         // Hiển thị thông tin giáo vụ
 

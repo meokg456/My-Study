@@ -29,7 +29,6 @@ import mystudy.Enum.Permission;
 import mystudy.Fonts.Fonts;
 import mystudy.POJOs.Student;
 import mystudy.POJOs.User;
-import mystudy.POJOs.Class;
 import mystudy.Routes.Routes;
 import mystudy.User.UserService;
 
@@ -48,13 +47,7 @@ public class AccountFragment extends JPanel implements Fragment {
 
     public AccountFragment() {
         setBackground(Colors.getBackground());
-        setLayout(new BorderLayout());
-        TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30), "Profile");
-        titledBorder.setTitleJustification(TitledBorder.CENTER);
-        titledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 36));
-        titledBorder.setTitleColor(Colors.getTextColor());
-        setBorder(new CompoundBorder(new EmptyBorder(150, 100, 50, 50),
-                (new CompoundBorder(titledBorder, new EmptyBorder(30, 30, 30, 30)))));
+
     }
 
     private JPanel buildStudentProfile(Student student) {
@@ -120,8 +113,15 @@ public class AccountFragment extends JPanel implements Fragment {
 
     public void build() {
         removeAll();
-        Student student = new Student("1712368", "Nguyễn Hữu Dũng", "Nam", "123456789", new Class("17CTT3"));
-        // Student student = user.getStudent();
+        setLayout(new BorderLayout());
+        TitledBorder profiletitledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30),
+                "Profile");
+        profiletitledBorder.setTitleJustification(TitledBorder.CENTER);
+        profiletitledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 36));
+        profiletitledBorder.setTitleColor(Colors.getTextColor());
+        setBorder(new CompoundBorder(new EmptyBorder(150, 100, 50, 50),
+                (new CompoundBorder(profiletitledBorder, new EmptyBorder(30, 30, 30, 30)))));
+        Student student = user.getStudent();
         JPanel accountPanel = this;
 
         if (user.getPermission().equals(Permission.STUDENT)) {
@@ -233,6 +233,7 @@ public class AccountFragment extends JPanel implements Fragment {
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
                 changePasswordPanel.removeAll();
+
                 build();
                 changePasswordPanel.validate();
                 changePasswordPanel.repaint();
@@ -252,8 +253,13 @@ public class AccountFragment extends JPanel implements Fragment {
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
+                if (newPasswordField.getPassword().equals(oldPasswordField.getPassword())) {
+                    JOptionPane.showMessageDialog(null, "New password and old password are the same!", "Invalid",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 if (!newPasswordField.getPassword().equals(confirmNewPasswordField.getPassword())) {
-                    JOptionPane.showMessageDialog(null, "New password and confirm new password does not match",
+                    JOptionPane.showMessageDialog(null, "New password and confirm new password does not match!",
                             "Invalid", JOptionPane.ERROR_MESSAGE);
                     return;
                 } else {

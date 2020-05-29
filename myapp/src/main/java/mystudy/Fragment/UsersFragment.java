@@ -46,6 +46,11 @@ public class UsersFragment extends JPanel implements Fragment {
 
     public UsersFragment() {
         setBackground(Colors.getBackground());
+
+    }
+
+    public void build() {
+        removeAll();
         setLayout(new BorderLayout(0, 20));
         TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30), "Users");
         titledBorder.setTitleJustification(TitledBorder.CENTER);
@@ -53,10 +58,6 @@ public class UsersFragment extends JPanel implements Fragment {
         titledBorder.setTitleColor(Colors.getTextColor());
         setBorder(new CompoundBorder(new EmptyBorder(150, 100, 50, 50),
                 (new CompoundBorder(titledBorder, new EmptyBorder(30, 30, 30, 30)))));
-    }
-
-    public void build() {
-        removeAll();
         Session session = DatabaseService.getInstance().getSession();
         List<User> users = session.createQuery("from User", User.class).list();
         UserAccountListModel userAccountListModel = new UserAccountListModel(users);
