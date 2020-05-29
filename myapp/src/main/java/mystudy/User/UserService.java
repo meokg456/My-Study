@@ -1,5 +1,7 @@
 package mystudy.User;
 
+import mystudy.POJOs.User;
+
 public class UserService {
 
     private static UserService instance;

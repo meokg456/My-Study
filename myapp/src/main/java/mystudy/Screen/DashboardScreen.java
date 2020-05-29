@@ -7,16 +7,26 @@ import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.event.MouseInputListener;
 
 import mystudy.Colors.Colors;
-import mystudy.Components.IconButton;
+import mystudy.Components.TabItem;
+import mystudy.Enum.Permission;
 import mystudy.Fonts.Fonts;
 import mystudy.Fragment.AccountFragment;
+import mystudy.Fragment.UsersFragment;
+import mystudy.User.UserService;
 
-public class DashboardScreen implements Screen {
+public class DashboardScreen implements Screen, MouseInputListener {
+
+    private TabItem selectedTabItem = null;
+    private Map<JPanel, JPanel> tabItems = new LinkedHashMap<>();
+    private JPanel pane = new JPanel();
 
     public JPanel build() {
-        JPanel pane = new JPanel();
+        pane.removeAll();
+        tabItems.clear();
+        selectedTabItem = null;
         pane.setBackground(Colors.getBackground());
         pane.setLayout(new BorderLayout());
 
@@ -29,38 +39,76 @@ public class DashboardScreen implements Screen {
         JLabel dashboardLabel = new JLabel("Dashboard");
         dashboardLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 48));
         dashboardLabel.setForeground(Colors.getTextColor());
-        dashboardLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        navigatePanel.add(dashboardLabel);
+        Box dashboardBox = Box.createHorizontalBox();
+        dashboardBox.add(dashboardLabel);
+        navigatePanel.add(dashboardBox);
         navigatePanel.add(Box.createVerticalStrut(50));
 
-        Map<JPanel, JPanel> tabItems = new LinkedHashMap<>();
         AccountFragment accountFragment = new AccountFragment();
-        IconButton accountTabItem = new IconButton(new ImageIcon("myapp/src/main/java/mystudy/Icons/man.png"),
-                "Account") {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 1L;
+        UsersFragment userFragment = new UsersFragment();
+        TabItem accountTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/man.png"), "Account");
+        accountTabItem.addMouseListener(this);
+        accountTabItem.setMaximumSize(new Dimension(390, 50));
 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                super.mouseReleased(e);
-                setBackground(Colors.getSecondary());
-                pane.add(accountFragment, BorderLayout.CENTER);
-                pane.validate();
-                pane.repaint();
-            }
-        };
+        TabItem usersTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/users.png"), "Users");
+        usersTabItem.addMouseListener(this);
+        usersTabItem.setMaximumSize(new Dimension(390, 50));
 
-        accountTabItem.setMaximumSize(new Dimension(600, 50));
+        if (UserService.getInstance().getLoggedUser().getPermission().equals(Permission.ADMIN))
+            tabItems.put(usersTabItem, userFragment);
         tabItems.put(accountTabItem, accountFragment);
 
         for (JPanel tabItem : tabItems.keySet()) {
-            navigatePanel.add(tabItem);
+            Box tabItemBox = Box.createHorizontalBox();
+            tabItemBox.add(tabItem);
+            navigatePanel.add(tabItemBox);
         }
 
         pane.add(navigatePanel, BorderLayout.LINE_START);
 
         return pane;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (selectedTabItem != null) {
+            selectedTabItem.setBackground(selectedTabItem.getParent().getBackground());
+            pane.remove(tabItems.get(selectedTabItem));
+        }
+
+        selectedTabItem = (TabItem) e.getComponent();
+        pane.add(tabItems.get(selectedTabItem), BorderLayout.CENTER);
+        pane.validate();
+        pane.repaint();
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+
     }
 }

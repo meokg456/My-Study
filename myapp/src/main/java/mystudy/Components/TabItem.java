@@ -9,7 +9,7 @@ import mystudy.Fonts.Fonts;
 import java.awt.*;
 import java.awt.event.*;
 
-public class IconButton extends JPanel implements MouseInputListener {
+public class TabItem extends JPanel implements MouseInputListener {
 
     /**
      *
@@ -26,7 +26,7 @@ public class IconButton extends JPanel implements MouseInputListener {
         this.oldBackground = oldBackground;
     }
 
-    public IconButton(ImageIcon icon, String title) {
+    public TabItem(ImageIcon icon, String title) {
         setBackground(Colors.getPrimary());
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         JLabel leading = new JLabel(icon);
@@ -57,6 +57,7 @@ public class IconButton extends JPanel implements MouseInputListener {
     @Override
     public void mouseReleased(MouseEvent e) {
         setOldBackground(Colors.getSecondary());
+        setBackground(Colors.getSecondary());
     }
 
     @Override

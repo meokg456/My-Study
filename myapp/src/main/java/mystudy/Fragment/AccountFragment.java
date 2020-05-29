@@ -1,24 +1,36 @@
 package mystudy.Fragment;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.MouseEvent;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import mystudy.Colors.Colors;
+import mystudy.Components.CardPanel;
 import mystudy.Components.MyPasswordField;
 import mystudy.Components.RoundedBorder;
 import mystudy.Components.RoundedButton;
 import mystudy.Connector.DatabaseService;
+import mystudy.Enum.Permission;
 import mystudy.Fonts.Fonts;
+import mystudy.POJOs.Student;
+import mystudy.POJOs.User;
+import mystudy.POJOs.Class;
 import mystudy.Routes.Routes;
-import mystudy.User.User;
 import mystudy.User.UserService;
 
 public class AccountFragment extends JPanel {
@@ -34,22 +46,88 @@ public class AccountFragment extends JPanel {
         buildProfileFragment();
     }
 
+    private JPanel buildStudentProfile(Student student) {
+
+        // Hiển thị thông tin sinh viên
+        CardPanel centerJPanel = new CardPanel(50);
+        add(centerJPanel);
+        centerJPanel.setLayout(new BoxLayout(centerJPanel, BoxLayout.Y_AXIS));
+        centerJPanel.setBorder(new EmptyBorder(20, 50, 10, 10));
+        centerJPanel.setBackground(Colors.getPrimary());
+
+        centerJPanel.add(Box.createVerticalStrut(50));
+        // Username
+        JLabel usernameJLabel = new JLabel();
+        centerJPanel.add(usernameJLabel);
+        usernameJLabel.setBackground(centerJPanel.getBackground());
+        usernameJLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+        usernameJLabel.setText("Username: " + user.getUsername());
+        usernameJLabel.setForeground(Colors.getTextColor());
+        centerJPanel.add(Box.createVerticalStrut(20));
+        // Mã số sinh viên
+        JLabel studentIdJLabel = new JLabel();
+        centerJPanel.add(studentIdJLabel);
+        studentIdJLabel.setBackground(centerJPanel.getBackground());
+        studentIdJLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+        studentIdJLabel.setText("Student ID: " + student.getStudentId());
+        studentIdJLabel.setForeground(Colors.getTextColor());
+        centerJPanel.add(Box.createVerticalStrut(20));
+        // Họ và tên
+        JLabel fullnameJLabel = new JLabel();
+        centerJPanel.add(fullnameJLabel);
+        fullnameJLabel.setBackground(centerJPanel.getBackground());
+        fullnameJLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+        fullnameJLabel.setText("Full name: " + student.getName());
+        fullnameJLabel.setForeground(Colors.getTextColor());
+        centerJPanel.add(Box.createVerticalStrut(20));
+        // Tên lớp
+        JLabel classNameJLabel = new JLabel();
+        centerJPanel.add(classNameJLabel);
+        classNameJLabel.setBackground(centerJPanel.getBackground());
+        classNameJLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+        classNameJLabel.setText("Class name: " + student.getClassName().getClassName());
+        classNameJLabel.setForeground(Colors.getTextColor());
+        centerJPanel.add(Box.createVerticalStrut(20));
+        // Giới tính
+        JLabel genderJLabel = new JLabel();
+        centerJPanel.add(genderJLabel);
+        genderJLabel.setBackground(centerJPanel.getBackground());
+        genderJLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+        genderJLabel.setText("Gender: " + student.getGender());
+        genderJLabel.setForeground(Colors.getTextColor());
+        centerJPanel.add(Box.createVerticalStrut(20));
+        // Số CMND
+        JLabel personalIdJLabel = new JLabel();
+        centerJPanel.add(personalIdJLabel);
+        personalIdJLabel.setBackground(centerJPanel.getBackground());
+        personalIdJLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+        personalIdJLabel.setText("Personal ID: " + student.getPersonalId());
+        personalIdJLabel.setForeground(Colors.getTextColor());
+
+        return centerJPanel;
+    }
+
     private void buildProfileFragment() {
+        Student student = new Student("1712368", "Nguyễn Hữu Dũng", "Nam", "123456789", new Class("17CTT3"));
+        // Student student = user.getStudent();
         JPanel accountPanel = this;
+
         setBackground(Colors.getBackground());
         setLayout(new BorderLayout());
-        JLabel label = new JLabel("Hello");
-        label.setPreferredSize(new Dimension(100, 50));
-        label.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
-        label.setForeground(Color.white);
-        TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30),
-                user.getName());
+        TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30), "Profile");
+        titledBorder.setTitleJustification(TitledBorder.CENTER);
         titledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 36));
         titledBorder.setTitleColor(Colors.getTextColor());
         setBorder(new CompoundBorder(new EmptyBorder(150, 100, 50, 50),
                 (new CompoundBorder(titledBorder, new EmptyBorder(30, 30, 30, 30)))));
-        add(label, BorderLayout.CENTER);
-        label.setBackground(Colors.getAccentColor());
+
+        if (user.getPermission().equals(Permission.STUDENT)) {
+            // Hiển thị thông tin sinh viên
+            add(buildStudentProfile(student));
+        } else {
+            add(buildAdminProfile());
+        }
+
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 20));
         bottomPanel.setBackground(Colors.getBackground());
         RoundedButton logoutButton = new RoundedButton("Logout", 50, 24) {
@@ -87,6 +165,27 @@ public class AccountFragment extends JPanel {
         add(bottomPanel, BorderLayout.PAGE_END);
     }
 
+    private JPanel buildAdminProfile() {
+        // Hiển thị thông tin giáo vụ
+        CardPanel centerJPanel = new CardPanel(50);
+        add(centerJPanel);
+        centerJPanel.setLayout(new BoxLayout(centerJPanel, BoxLayout.Y_AXIS));
+        centerJPanel.setBorder(new EmptyBorder(20, 50, 10, 10));
+        centerJPanel.setBackground(Colors.getPrimary());
+
+        centerJPanel.add(Box.createVerticalStrut(50));
+        // Username
+        JLabel usernameJLabel = new JLabel();
+        centerJPanel.add(usernameJLabel);
+        usernameJLabel.setBackground(centerJPanel.getBackground());
+        usernameJLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+        usernameJLabel.setText("Username: " + user.getUsername());
+        usernameJLabel.setForeground(Colors.getTextColor());
+        centerJPanel.add(Box.createVerticalStrut(20));
+
+        return centerJPanel;
+    }
+
     protected void buildChangePasswordFragment() {
         JPanel changePasswordPanel = this;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -95,25 +194,32 @@ public class AccountFragment extends JPanel {
         titledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 36));
         titledBorder.setTitleJustification(TitledBorder.CENTER);
         titledBorder.setTitleColor(Colors.getTextColor());
-        setBorder(new CompoundBorder(new EmptyBorder(150, 500, 250, 500),
-                (new CompoundBorder(titledBorder, new EmptyBorder(30, 30, 30, 30)))));
+        setBorder(new CompoundBorder(new EmptyBorder(150, 490, 250, 490),
+                (new CompoundBorder(titledBorder, new EmptyBorder(30, 30, 50, 30)))));
         MyPasswordField oldPasswordField = new MyPasswordField("Old password", Colors.getTextColor(), 24);
         oldPasswordField.setMaximumSize(new Dimension(530, 100));
-        add(Box.createVerticalStrut(40));
-        add(oldPasswordField);
+        CardPanel card = new CardPanel(50);
+        add(card);
+        card.setBackground(Colors.getPrimary());
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBorder(new EmptyBorder(10, 10, 10, 10));
+        card.add(Box.createVerticalStrut(40));
+        card.add(oldPasswordField);
         MyPasswordField newPasswordField = new MyPasswordField("New password", Colors.getTextColor(), 24);
         newPasswordField.setMaximumSize(new Dimension(530, 100));
-        add(Box.createVerticalStrut(10));
-        add(newPasswordField);
+        card.add(Box.createVerticalStrut(10));
+        card.add(newPasswordField);
         MyPasswordField confirmNewPasswordField = new MyPasswordField("Confirm new password", Colors.getTextColor(),
                 24);
         confirmNewPasswordField.setMaximumSize(new Dimension(530, 100));
-        add(Box.createVerticalStrut(10));
-        add(confirmNewPasswordField);
-        add(Box.createVerticalGlue());
+        card.add(Box.createVerticalStrut(10));
+        card.add(confirmNewPasswordField);
+        card.add(Box.createVerticalGlue());
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        bottomPanel.setBackground(getBackground());
+        card.add(Box.createVerticalStrut(20));
+        card.add(bottomPanel);
+        bottomPanel.setBackground(bottomPanel.getParent().getBackground());
         RoundedButton backButton = new RoundedButton("Back", 50, 24) {
             /**
              *
@@ -149,12 +255,17 @@ public class AccountFragment extends JPanel {
                     return;
                 } else {
                     user.setPassword(newPasswordField.getPassword());
-                    Transaction transaction;
 
                     Session session = DatabaseService.getInstance().getSession();
-                    transaction = session.beginTransaction();
-                    session.update(user);
-                    transaction.commit();
+                    Transaction transaction = null;
+                    try {
+                        transaction = session.beginTransaction();
+                        session.update(user);
+                        transaction.commit();
+                    } catch (HibernateException ex) {
+                        ex.printStackTrace();
+                        transaction.rollback();
+                    }
                     JOptionPane.showMessageDialog(null, "Password has been changed!", "Success",
                             JOptionPane.INFORMATION_MESSAGE);
 
@@ -170,6 +281,6 @@ public class AccountFragment extends JPanel {
         changePasswordButton.setPreferredSize(new Dimension(250, 50));
         bottomPanel.add(backButton);
         bottomPanel.add(changePasswordButton);
-        add(bottomPanel);
+
     }
 }

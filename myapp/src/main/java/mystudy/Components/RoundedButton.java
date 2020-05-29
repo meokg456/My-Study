@@ -46,6 +46,18 @@ public class RoundedButton extends JPanel implements MouseInputListener {
     }
 
     @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        if (enabled == false) {
+            setBackground(Colors.getAccentColor());
+            removeMouseListener(this);
+        } else {
+            setBackground(Colors.getSecondary());
+            addMouseListener(this);
+        }
+    }
+
+    @Override
     public void mouseMoved(MouseEvent e) {
 
     }

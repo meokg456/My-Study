@@ -1,5 +1,7 @@
 package mystudy;
 
+import java.awt.Dimension;
+
 import javax.swing.*;
 
 import mystudy.Connector.DatabaseService;
@@ -19,7 +21,7 @@ public class Main {
 
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setTitle("My Study");
-
+        window.setPreferredSize(new Dimension(1200, 1000));
         window.setVisible(true);
         window.pack();
 

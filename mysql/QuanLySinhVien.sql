@@ -1,7 +1,70 @@
 create database quanlysinhvien;
 use quanlysinhvien;
 
-create table users(username varchar(30) primary key, password varchar(200) not null, permission int not null, name nvarchar(30) not null, gender int not null, CMND varchar(10) not null);
+drop table classes;
+create table classes(
+	className varchar(10) primary key not null
+);
 
-insert into users values ("giaovu", "giaovu", 0, "Giáo vụ", 0, "123456789");
-insert into users values ("1712368", "1712368", 1, "Nguyễn Hữu Dũng", 0, "123406789");
+drop table students;
+create table students(
+	studentId varchar(10) primary key,
+	name varchar(30) not null,
+	gender nvarchar(5) not null,
+	personalId varchar(10) not null,
+	className varchar(10) not null,
+	constraint foreign key(className) references classes(className)
+);
+
+drop table users;
+create table users(
+	username varchar(30) primary key,
+	password varchar(200) not null,
+	permission int not null,
+	studentId varchar(10),
+	constraint foreign key(studentId) references students(studentId)
+);
+
+drop table courses;
+create table courses(
+	courseId varchar(10) primary key not null,
+    courseName nvarchar(30) not null,
+    RoomId varchar(10) not null
+);
+
+drop table registrations;
+create table registrations(
+	studentId varchar(10) not null,
+    courseId varchar(10) not null,
+    constraint primary key(studentId, courseId),
+    constraint foreign key(studentId) references students(studentId),
+    constraint foreign key(courseId) references courses(courseId)
+    
+);
+drop table timetable;
+create table timetable(
+	className varchar(10) not null,
+    courseId varchar(10) not null,
+    constraint primary key(className, courseId),
+	constraint foreign key(className) references classes(className),
+	constraint foreign key(courseId) references courses(courseId)
+);
+
+drop table results;
+create table results(
+	studentId varchar(10) not null,
+    courseId varchar(10) not null,
+    midSemesterGrade float not null,
+    finalExamGrade float not null,
+    otherGrade float not null,
+    GPA float not null,
+    constraint primary key(studentId, courseId),
+    constraint foreign key(studentId) references students(studentId),
+    constraint foreign key(courseId) references courses(courseId)
+    
+);
+
+insert into users values ("giaovu", "giaovu", 0, null);
+insert into classes values ("17CTT3");
+insert into students values ("1712368", "Nguyễn Hữu Dũng", "Nam", "123456789", "17CTT3");
+insert into users values ("1712368", "1712368", 1, "1712368");

@@ -18,7 +18,7 @@ public class MyTextField extends JPanel {
     public MyTextField(String title, Color color, int fontSize) {
         setOpaque(false);
         RoundedBorder line = new RoundedBorder(color, 1, true, 30);
-        TitledBorder border = BorderFactory.createTitledBorder(line, title);
+        TitledBorder border = new TitledBorder(line, title);
         border.setTitleFont(new Font(Fonts.getFont().getName(), Font.PLAIN, fontSize));
         border.setTitleColor(Colors.getTextColor());
         setBorder(new CompoundBorder(border, new EmptyBorder(5, 10, 12, 10)));

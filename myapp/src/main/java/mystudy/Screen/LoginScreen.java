@@ -11,8 +11,8 @@ import mystudy.Components.CardPanel;
 import mystudy.Components.MyPasswordField;
 import mystudy.Components.MyTextField;
 import mystudy.Fonts.Fonts;
+import mystudy.POJOs.User;
 import mystudy.Routes.Routes;
-import mystudy.User.User;
 import mystudy.User.UserService;
 
 import java.awt.*;

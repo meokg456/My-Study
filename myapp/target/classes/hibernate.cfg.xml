@@ -10,6 +10,8 @@
         <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/QuanLySinhVien?autoReconnect&amp;useUnicode=true&amp;characterEncoding=UTF-8</property>
         <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password">077874036</property>
-        <mapping class="mystudy.User.User" />
+        <mapping class="mystudy.POJOs.User" />
+        <mapping class="mystudy.POJOs.Student" />
+        <mapping class="mystudy.POJOs.Class" />
     </session-factory>
 </hibernate-configuration>

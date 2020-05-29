@@ -1,4 +1,4 @@
-package mystudy.User;
+package mystudy.Enum;
 
 public enum Permission {
     ADMIN, STUDENT

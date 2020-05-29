@@ -6,7 +6,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
-import mystudy.User.User;
+import mystudy.POJOs.User;
 
 public class HibernateUtil {
     private static StandardServiceRegistry standardServiceRegistry;
