@@ -41,7 +41,7 @@ public class StudentListModel extends AbstractTableModel {
         Student student = list.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                return rowIndex;
+                return rowIndex + 1;
             case 1:
                 return student.getStudentId();
             case 2:

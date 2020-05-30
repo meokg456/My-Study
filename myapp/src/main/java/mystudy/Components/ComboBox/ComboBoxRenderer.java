@@ -3,7 +3,6 @@ package mystudy.Components.ComboBox;
 import javax.swing.*;
 
 import mystudy.Colors.Colors;
-import mystudy.POJOs.Class;
 
 import java.awt.*;
 
@@ -33,9 +32,9 @@ public class ComboBoxRenderer extends JLabel implements ListCellRenderer<Object>
             setBackground(list.getBackground());
             setForeground(list.getForeground());
         }
-        Class myClass = (Class) value;
-        if (myClass != null)
-            setText(myClass.getClassName());
+
+        if (value != null)
+            setText(value.toString());
 
         return this;
     }

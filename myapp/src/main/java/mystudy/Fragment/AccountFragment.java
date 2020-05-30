@@ -117,9 +117,9 @@ public class AccountFragment extends JPanel implements Fragment {
         TitledBorder profiletitledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30),
                 "Profile");
         profiletitledBorder.setTitleJustification(TitledBorder.CENTER);
-        profiletitledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 36));
+        profiletitledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.BOLD, 36));
         profiletitledBorder.setTitleColor(Colors.getTextColor());
-        setBorder(new CompoundBorder(new EmptyBorder(150, 100, 50, 50),
+        setBorder(new CompoundBorder(new EmptyBorder(150, 100, 50, 100),
                 (new CompoundBorder(profiletitledBorder, new EmptyBorder(30, 30, 30, 30)))));
         Student student = user.getStudent();
         JPanel accountPanel = this;
@@ -194,7 +194,7 @@ public class AccountFragment extends JPanel implements Fragment {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30),
                 "Change Password");
-        titledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 36));
+        titledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.BOLD, 36));
         titledBorder.setTitleJustification(TitledBorder.CENTER);
         titledBorder.setTitleColor(Colors.getTextColor());
         setBorder(new CompoundBorder(new EmptyBorder(150, 490, 250, 490),

@@ -7,7 +7,6 @@ import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -54,12 +53,13 @@ public class UsersFragment extends JPanel implements Fragment {
         setLayout(new BorderLayout(0, 20));
         TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30), "Users");
         titledBorder.setTitleJustification(TitledBorder.CENTER);
-        titledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 36));
+        titledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.BOLD, 36));
         titledBorder.setTitleColor(Colors.getTextColor());
-        setBorder(new CompoundBorder(new EmptyBorder(150, 100, 50, 50),
+        setBorder(new CompoundBorder(new EmptyBorder(150, 100, 50, 100),
                 (new CompoundBorder(titledBorder, new EmptyBorder(30, 30, 30, 30)))));
         Session session = DatabaseService.getInstance().getSession();
-        List<User> users = session.createQuery("from User", User.class).list();
+        List<User> users = session.createQuery("from User u order by u.username", User.class).list();
+        session.clear();
         UserAccountListModel userAccountListModel = new UserAccountListModel(users);
 
         RoundedButton resetButton = new RoundedButton("Reset Password", 50, 24) {
@@ -83,6 +83,7 @@ public class UsersFragment extends JPanel implements Fragment {
                         transaction.commit();
                         userAccountListModel.fireTableDataChanged();
                         setEnabled(false);
+                        session.clear();
                     } catch (HibernateException ex) {
                         ex.printStackTrace();
                         transaction.rollback();
@@ -104,8 +105,6 @@ public class UsersFragment extends JPanel implements Fragment {
         centerJPanel.setLayout(new BoxLayout(centerJPanel, BoxLayout.Y_AXIS));
         centerJPanel.setBorder(new EmptyBorder(20, 50, 20, 50));
         centerJPanel.setBackground(Colors.getPrimary());
-
-        centerJPanel.add(Box.createVerticalStrut(50));
 
         // Users account table
         MyTable accountTable = new MyTable(userAccountListModel) {

@@ -16,15 +16,15 @@ public class User implements Serializable {
 
     @Id
     @Column(name = "username", nullable = false, length = 30)
-    private String Username;
+    private String username;
 
     @Column(name = "password", nullable = false, length = 200)
-    private String Password;
+    private String password;
 
     @Column(name = "permission", nullable = false)
     private Permission permission;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "studentId")
     private Student student;
 
@@ -32,26 +32,26 @@ public class User implements Serializable {
     }
 
     public User(String Username, String Password, Permission permission, Student student) {
-        this.Username = Username;
-        this.Password = Password;
+        this.username = Username;
+        this.password = Password;
         this.permission = permission;
         this.student = student;
     }
 
     public String getUsername() {
-        return this.Username;
+        return this.username;
     }
 
     public void setUsername(String Username) {
-        this.Username = Username;
+        this.username = Username;
     }
 
     public String getPassword() {
-        return this.Password;
+        return this.password;
     }
 
     public void setPassword(String Password) {
-        this.Password = Password;
+        this.password = Password;
     }
 
     public Permission getPermission() {

@@ -1,13 +1,14 @@
 package mystudy.POJOs;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "students")
@@ -85,22 +86,4 @@ public class Student implements Serializable {
         this.className = className;
     }
 
-    public static List<Student> readStudentsFromCSV(InputStreamReader fileReader) throws IOException {
-        List<Student> students = new ArrayList<>();
-        BufferedReader reader = new BufferedReader(fileReader);
-        // Đọc tên lớp
-        Class fromClass = new Class(reader.readLine().split(",")[0]);
-        // Đọc bỏ dòng tên cột
-        String line = reader.readLine();
-        line = reader.readLine();
-        while (line != null) {
-            // Đọc từng dòng
-            String[] args = line.split(",");
-            Student student = new Student(args[1], args[2], args[3], args[4], fromClass);
-            students.add(student);
-            line = reader.readLine();
-        }
-        reader.close();
-        return students;
-    }
 }

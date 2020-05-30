@@ -49,7 +49,7 @@ public class DashboardScreen implements Screen, MouseInputListener {
         AccountFragment accountFragment = new AccountFragment();
         UsersFragment userFragment = new UsersFragment();
         StudentsFragment studentsFragment = new StudentsFragment();
-        TabItem accountTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/man.png"), "Account");
+        TabItem accountTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/user.png"), "Account");
         accountTabItem.addMouseListener(this);
         accountTabItem.setMaximumSize(new Dimension(390, 50));
 
@@ -58,7 +58,7 @@ public class DashboardScreen implements Screen, MouseInputListener {
         studentsTabItem.addMouseListener(this);
         studentsTabItem.setMaximumSize(new Dimension(390, 50));
 
-        TabItem usersTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/users.png"), "User");
+        TabItem usersTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/team.png"), "User");
         usersTabItem.addMouseListener(this);
         usersTabItem.setMaximumSize(new Dimension(390, 50));
 
@@ -97,8 +97,8 @@ public class DashboardScreen implements Screen, MouseInputListener {
         }
 
         selectedTabItem = (TabItem) e.getComponent();
-        pane.add(tabItems.get(selectedTabItem).getPanel(), BorderLayout.CENTER);
         tabItems.get(selectedTabItem).build();
+        pane.add(tabItems.get(selectedTabItem).getPanel(), BorderLayout.CENTER);
         pane.validate();
         pane.repaint();
     }

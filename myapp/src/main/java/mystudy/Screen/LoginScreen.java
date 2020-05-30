@@ -31,15 +31,15 @@ public class LoginScreen implements Screen {
 
         JLabel label = new JLabel("Login");
         label.setForeground(Colors.getTextColor());
-        label.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 64));
+        label.setFont(new Font(Fonts.getFont().getName(), Font.BOLD, 64));
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        MyTextField username = new MyTextField("Username", Colors.getTextColor(), 36);
-        username.setMaximumSize(new Dimension(530, 120));
+        MyTextField usernameTextField = new MyTextField("Username", Colors.getTextColor(), 36);
+        usernameTextField.setMaximumSize(new Dimension(530, 120));
 
-        MyPasswordField password = new MyPasswordField("Password", Colors.getTextColor(), 36);
+        MyPasswordField passwordTextField = new MyPasswordField("Password", Colors.getTextColor(), 36);
 
-        password.setMaximumSize(new Dimension(530, 120));
+        passwordTextField.setMaximumSize(new Dimension(530, 120));
 
         login.setBackground(Colors.getPrimary());
         login.setPreferredSize(new Dimension(600, 800));
@@ -47,8 +47,8 @@ public class LoginScreen implements Screen {
         login.add(Box.createRigidArea(new Dimension(0, 100)));
         login.add(label);
         login.add(Box.createRigidArea(new Dimension(0, 75)));
-        login.add(username);
-        login.add(password);
+        login.add(usernameTextField);
+        login.add(passwordTextField);
         login.add(Box.createRigidArea(new Dimension(0, 50)));
 
         screenPanel.add(login);
@@ -68,21 +68,33 @@ public class LoginScreen implements Screen {
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
                 setBackground(Colors.getSecondary());
-
-                User user = (User) session.get(User.class, username.getText());
-                if (user == null) {
-                    JOptionPane.showMessageDialog(null, "Your username is not existed", "Invalid username",
+                String username = usernameTextField.getText();
+                String password = passwordTextField.getPassword();
+                if (username.equals("")) {
+                    JOptionPane.showMessageDialog(null, "Username can not be empty!", "Empty username",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                if (user.getPassword().equals(password.getPassword())) {
+                if (password.equals("")) {
+                    JOptionPane.showMessageDialog(null, "Password can not be empty!", "Empty password",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                User user = (User) session.get(User.class, username);
+                if (user == null) {
+                    JOptionPane.showMessageDialog(null, "Your username is not existed!", "Invalid username",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (user.getPassword().equals(password)) {
                     System.out.println("Login in with " + user.getUsername());
                     UserService.getInstance().setLoggedUser(user);
                     Routes.getInstance().route("Dashboard");
-                    password.setPassword("");
+                    passwordTextField.setPassword("");
+                    session.clear();
 
                 } else {
-                    JOptionPane.showMessageDialog(null, "Your password is wrong", "Invalid password",
+                    JOptionPane.showMessageDialog(null, "Your password is wrong!", "Invalid password",
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
