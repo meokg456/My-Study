@@ -13,5 +13,8 @@
         <mapping class="mystudy.POJOs.User" />
         <mapping class="mystudy.POJOs.Student" />
         <mapping class="mystudy.POJOs.Class" />
+        <mapping class="mystudy.POJOs.TimeTable" />
+        <mapping class="mystudy.POJOs.Course" />
+        <mapping class="mystudy.POJOs.Registration" />
     </session-factory>
 </hibernate-configuration>

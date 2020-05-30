@@ -106,7 +106,7 @@ public class UsersFragment extends JPanel implements Fragment {
         centerJPanel.setBorder(new EmptyBorder(20, 50, 20, 50));
         centerJPanel.setBackground(Colors.getPrimary());
 
-        // Users account table
+        // Hiển thị bảng account của tất cả mọi người
         MyTable accountTable = new MyTable(userAccountListModel) {
             /**
              *

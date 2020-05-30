@@ -72,6 +72,7 @@ public class StudentsFragment extends JPanel implements Fragment {
 
     public void build() {
         removeAll();
+        // Khởi tạo trước các session dữ liệu set border cho fragment
         Session session = DatabaseService.getInstance().getSession();
         List<Student> students = new ArrayList<>();
         Vector<Class> classes = new Vector<>();
@@ -83,7 +84,7 @@ public class StudentsFragment extends JPanel implements Fragment {
         setBorder(new CompoundBorder(new EmptyBorder(150, 100, 50, 100),
                 (new CompoundBorder(titledBorder, new EmptyBorder(30, 30, 30, 30)))));
 
-        classes.clear();
+        // Lấy danh sách lớp
         classes.addAll(session.createQuery("from Class c ORDER BY c.className", Class.class).list());
 
         StudentListModel model = new StudentListModel(students);
@@ -92,6 +93,7 @@ public class StudentsFragment extends JPanel implements Fragment {
         add(topPanel, BorderLayout.PAGE_START);
         topPanel.setBackground(topPanel.getParent().getBackground());
 
+        // Tạo Combobox chọn lớp
         JComboBox<Class> classesComboBox = new JComboBox<Class>(classes);
         topPanel.add(classesComboBox, BorderLayout.LINE_START);
         ComboBoxRenderer comboBoxRenderer = new ComboBoxRenderer();
@@ -100,6 +102,7 @@ public class StudentsFragment extends JPanel implements Fragment {
         classesComboBox.setForeground(Colors.getTextColor());
         classesComboBox.setPreferredSize(new Dimension(200, 50));
         classesComboBox.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+        // Tạo nút thêm sinh viên mới
         RoundedButton addButton = new RoundedButton("Add student", 50, 24) {
             /**
              *
@@ -109,7 +112,7 @@ public class StudentsFragment extends JPanel implements Fragment {
             @Override
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
-
+                // Hiển thị form điền thông tin sinh viên mới
                 buildAddStudentFormView();
 
             }
@@ -120,6 +123,7 @@ public class StudentsFragment extends JPanel implements Fragment {
         else {
             classesComboBox.setSelectedItem(selectedClass);
         }
+        // Lấy danh sách sinh viên trong lớp đã chọn
         Query<Student> query = session
                 .createQuery("select s from Student s where s.className = :class ORDER BY s.studentId", Student.class);
         query.setParameter("class", selectedClass);
@@ -130,9 +134,10 @@ public class StudentsFragment extends JPanel implements Fragment {
             addButton.setEnabled(false);
 
         classesComboBox.addActionListener(new ActionListener() {
-
+            // Xử lý sự kiện chọn lớp
             @Override
             public void actionPerformed(ActionEvent e) {
+                // lấy danh sách lớp hiển thị lên
                 selectedClass = (Class) classesComboBox.getSelectedItem();
                 Query<Student> query = session.createQuery(
                         "select s from Student s where s.className = :class ORDER BY s.studentId", Student.class);
@@ -146,7 +151,7 @@ public class StudentsFragment extends JPanel implements Fragment {
             }
 
         });
-
+        // Tạo nút import một lớp mới
         RoundedButton importButton = new RoundedButton("Import students", 50, 24) {
             /**
              *
@@ -200,13 +205,14 @@ public class StudentsFragment extends JPanel implements Fragment {
                             classes.clear();
                             classes.addAll(
                                     session.createQuery("from Class c ORDER BY c.className", Class.class).list());
-                            classesComboBox.setSelectedItem(newClass);
-                            session.clear();
+
                         } catch (HibernateException ex) {
                             ex.printStackTrace();
                             System.out.print(ex.getMessage());
                             transaction.rollback();
                         }
+                        classesComboBox.setSelectedItem(newClass);
+                        session.clear();
                     } catch (IOException e1) {
                         e1.printStackTrace();
 
@@ -231,7 +237,7 @@ public class StudentsFragment extends JPanel implements Fragment {
         centerJPanel.setBorder(new EmptyBorder(20, 50, 20, 50));
         centerJPanel.setBackground(Colors.getPrimary());
 
-        // Students account table
+        // Tạo bảng hiển thị thông tin sinh viên
         MyTable studentTable = new MyTable(model) {
             /**
              *
@@ -263,6 +269,7 @@ public class StudentsFragment extends JPanel implements Fragment {
 
     private void buildAddStudentFormView() {
         removeAll();
+        // Set lại border
         setLayout(new BorderLayout(0, 20));
         TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30), "Students");
         titledBorder.setTitleJustification(TitledBorder.CENTER);
@@ -284,7 +291,7 @@ public class StudentsFragment extends JPanel implements Fragment {
         classLabelBox.add(classNameLabel);
         formPanel.add(classLabelBox);
         formPanel.add(Box.createRigidArea(new Dimension(0, 50)));
-        // Điền thông tin các kiểu
+        // Điền thông tin sinh viên
         MyTextField studentIDTextField = new MyTextField("Student ID", Colors.getTextColor(), 24);
         MyTextField studentNameTextField = new MyTextField("Full name", Colors.getTextColor(), 24);
 
@@ -324,7 +331,7 @@ public class StudentsFragment extends JPanel implements Fragment {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
         add(bottomPanel, BorderLayout.PAGE_END);
         bottomPanel.setBackground(getParent().getBackground());
-
+        // Nút quay lại
         RoundedButton backButton = new RoundedButton("Back", 50, 24) {
             /**
              *
@@ -339,8 +346,8 @@ public class StudentsFragment extends JPanel implements Fragment {
         };
         bottomPanel.add(backButton);
         backButton.setPreferredSize(new Dimension(200, 50));
-
-        RoundedButton addButton = new RoundedButton("Add student", 50, 24) {
+        // Nút xác nhận
+        RoundedButton addButton = new RoundedButton("Confirm", 50, 24) {
 
             /**
              *

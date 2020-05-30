@@ -16,6 +16,7 @@ import mystudy.Fonts.Fonts;
 import mystudy.Fragment.AccountFragment;
 import mystudy.Fragment.Fragment;
 import mystudy.Fragment.StudentsFragment;
+import mystudy.Fragment.TimeTableFragment;
 import mystudy.Fragment.UsersFragment;
 import mystudy.User.UserService;
 
@@ -31,7 +32,7 @@ public class DashboardScreen implements Screen, MouseInputListener {
         selectedTabItem = null;
         pane.setBackground(Colors.getBackground());
         pane.setLayout(new BorderLayout());
-
+        // Tạo Menu điều hướng bên trái
         JPanel navigatePanel = new JPanel();
         navigatePanel.setLayout(new BoxLayout(navigatePanel, BoxLayout.Y_AXIS));
         navigatePanel.setBackground(Colors.getPrimary());
@@ -49,6 +50,8 @@ public class DashboardScreen implements Screen, MouseInputListener {
         AccountFragment accountFragment = new AccountFragment();
         UsersFragment userFragment = new UsersFragment();
         StudentsFragment studentsFragment = new StudentsFragment();
+        TimeTableFragment timeTableFragment = new TimeTableFragment();
+        // Tạo nút tab
         TabItem accountTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/user.png"), "Account");
         accountTabItem.addMouseListener(this);
         accountTabItem.setMaximumSize(new Dimension(390, 50));
@@ -62,6 +65,12 @@ public class DashboardScreen implements Screen, MouseInputListener {
         usersTabItem.addMouseListener(this);
         usersTabItem.setMaximumSize(new Dimension(390, 50));
 
+        TabItem timeTableTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/calendar.png"),
+                "Time table");
+        timeTableTabItem.addMouseListener(this);
+        timeTableTabItem.setMaximumSize(new Dimension(390, 50));
+        // Tạo các tab tùy theo quyền user
+        tabItems.put(timeTableTabItem, timeTableFragment);
         if (UserService.getInstance().getLoggedUser().getPermission().equals(Permission.ADMIN)) {
             tabItems.put(studentsTabItem, studentsFragment);
             tabItems.put(usersTabItem, userFragment);
