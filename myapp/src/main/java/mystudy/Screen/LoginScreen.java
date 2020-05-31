@@ -100,6 +100,7 @@ public class LoginScreen implements Screen {
             }
         };
         button.setMaximumSize(new Dimension(260, 50));
+        button.setAlignmentX(Component.LEFT_ALIGNMENT);
         login.add(button);
         return screenPanel;
     }

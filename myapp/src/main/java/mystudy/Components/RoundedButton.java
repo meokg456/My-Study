@@ -24,7 +24,6 @@ public class RoundedButton extends JPanel implements MouseInputListener {
         add(buttonLabel, BorderLayout.CENTER);
         buttonLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, fontSize));
         setBackground(Colors.getSecondary());
-        setAlignmentX(Component.LEFT_ALIGNMENT);
         addMouseListener(this);
     }
 

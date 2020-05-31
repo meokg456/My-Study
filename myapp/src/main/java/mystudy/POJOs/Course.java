@@ -52,4 +52,16 @@ public class Course {
         this.roomId = roomId;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        Course course = (Course) obj;
+        if (course == null)
+            return false;
+        return course.courseId.equals(courseId);
+    }
+
+    @Override
+    public String toString() {
+        return courseId + " - " + courseName;
+    }
 }

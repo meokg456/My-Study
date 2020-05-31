@@ -14,6 +14,7 @@ import mystudy.Components.TabItem;
 import mystudy.Enum.Permission;
 import mystudy.Fonts.Fonts;
 import mystudy.Fragment.AccountFragment;
+import mystudy.Fragment.CoursesFragment;
 import mystudy.Fragment.Fragment;
 import mystudy.Fragment.StudentsFragment;
 import mystudy.Fragment.TimeTableFragment;
@@ -51,6 +52,7 @@ public class DashboardScreen implements Screen, MouseInputListener {
         UsersFragment userFragment = new UsersFragment();
         StudentsFragment studentsFragment = new StudentsFragment();
         TimeTableFragment timeTableFragment = new TimeTableFragment();
+        CoursesFragment coursesFragment = new CoursesFragment();
         // Tạo nút tab
         TabItem accountTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/user.png"), "Account");
         accountTabItem.addMouseListener(this);
@@ -69,11 +71,17 @@ public class DashboardScreen implements Screen, MouseInputListener {
                 "Time table");
         timeTableTabItem.addMouseListener(this);
         timeTableTabItem.setMaximumSize(new Dimension(390, 50));
+
+        TabItem courseTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/book.png"), "Course");
+        courseTabItem.addMouseListener(this);
+        courseTabItem.setMaximumSize(new Dimension(390, 50));
         // Tạo các tab tùy theo quyền user
         tabItems.put(timeTableTabItem, timeTableFragment);
         if (UserService.getInstance().getLoggedUser().getPermission().equals(Permission.ADMIN)) {
+            tabItems.put(courseTabItem, coursesFragment);
             tabItems.put(studentsTabItem, studentsFragment);
             tabItems.put(usersTabItem, userFragment);
+
         }
         tabItems.put(accountTabItem, accountFragment);
 

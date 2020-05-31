@@ -100,15 +100,11 @@ public class TimeTableFragment extends JPanel implements Fragment {
 
         if (selectedClass == null)
             selectedClass = (Class) classesComboBox.getSelectedItem();
-        else {
-            classesComboBox.setSelectedItem(selectedClass);
-        }
 
         courses.clear();
         // Lấy thời khóa biểu của lớp đã chọn
         courses.addAll(fetchCourses(session, selectedClass));
-
-        session.clear();
+        classesComboBox.setSelectedItem(selectedClass);
 
         classesComboBox.addActionListener(new ActionListener() {
             // Xử lý sự kiện chọn lớp
@@ -271,6 +267,7 @@ public class TimeTableFragment extends JPanel implements Fragment {
         for (TimeTable courseInClass : timeTable) {
             courses.add(courseInClass.getCourseInClass().getCourse());
         }
+        session.clear();
         return courses;
     }
 }

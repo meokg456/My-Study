@@ -29,9 +29,16 @@ public class Class {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        Class toClass = (Class) obj;
+        if (toClass == null)
+            return false;
+        return this.className.equals(toClass.className);
+    }
+
+    @Override
     public String toString() {
         return this.className;
     }
-
 
 }

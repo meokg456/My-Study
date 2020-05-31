@@ -21,8 +21,6 @@ public class ComboBoxRenderer extends JLabel implements ListCellRenderer<Object>
     @Override
     public Component getListCellRendererComponent(JList<? extends Object> list, Object value, int index,
             boolean isSelected, boolean cellHasFocus) {
-        // list.setBackground(Colors.getPrimary().darker());
-        // list.setForeground(Colors.getTextColor());
         list.setSelectionBackground(Colors.getPrimary().darker());
         list.setSelectionForeground(Colors.getTextColor());
         if (isSelected) {
@@ -35,7 +33,8 @@ public class ComboBoxRenderer extends JLabel implements ListCellRenderer<Object>
 
         if (value != null)
             setText(value.toString());
-
+        else
+            setText("");
         return this;
     }
 }

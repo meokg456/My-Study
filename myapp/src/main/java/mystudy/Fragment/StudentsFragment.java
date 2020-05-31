@@ -120,9 +120,7 @@ public class StudentsFragment extends JPanel implements Fragment {
         addButton.setPreferredSize(new Dimension(200, 50));
         if (selectedClass == null)
             selectedClass = (Class) classesComboBox.getSelectedItem();
-        else {
-            classesComboBox.setSelectedItem(selectedClass);
-        }
+
         // Lấy danh sách sinh viên trong lớp đã chọn
         Query<Student> query = session
                 .createQuery("select s from Student s where s.className = :class ORDER BY s.studentId", Student.class);
@@ -132,7 +130,7 @@ public class StudentsFragment extends JPanel implements Fragment {
         session.clear();
         if (selectedClass == null)
             addButton.setEnabled(false);
-
+        classesComboBox.setSelectedItem(selectedClass);
         classesComboBox.addActionListener(new ActionListener() {
             // Xử lý sự kiện chọn lớp
             @Override
