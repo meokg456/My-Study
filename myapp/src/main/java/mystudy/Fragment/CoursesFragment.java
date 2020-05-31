@@ -2,7 +2,6 @@ package mystudy.Fragment;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -58,6 +57,7 @@ public class CoursesFragment extends JPanel implements Fragment {
     private Class selectedClass = null;
     private Course selectedCourse = null;
     private Student addingStudent = null;
+    private int selectedStudentIndex = -1;
 
     public CoursesFragment() {
         setBackground(Colors.getBackground());
@@ -129,12 +129,46 @@ public class CoursesFragment extends JPanel implements Fragment {
             @Override
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
-                // Hiển thị form điền thông tin sinh viên mới
+                // Hiển thị màn hình tìm kiếm sinh viên
                 buildAddStudentFormView();
 
             }
         };
         addButton.setPreferredSize(new Dimension(200, 50));
+
+        RoundedButton removeButton = new RoundedButton("Remove", 50, 24) {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                super.mouseReleased(e);
+                Student selectedStudent = students.get(selectedStudentIndex);
+                // Hiển thị form điền thông tin sinh viên mới
+                Registration registration = session.find(Registration.class,
+                        new RegistrationPK(selectedStudent, selectedCourse));
+                if (registration == null) {
+                    JOptionPane.showMessageDialog(null, "Student doesn't existed!", "Student not found",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                Transaction transaction = null;
+                try {
+                    transaction = session.beginTransaction();
+                    session.remove(registration);
+                    transaction.commit();
+                    students.remove(selectedStudent);
+                    model.fireTableRowsDeleted(selectedStudentIndex, selectedStudentIndex);
+                } catch (HibernateException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        };
+        removeButton.setPreferredSize(new Dimension(200, 50));
+        removeButton.setEnabled(false);
 
         classesComboBox.addActionListener(new ActionListener() {
             // Xử lý sự kiện chọn lớp
@@ -152,6 +186,7 @@ public class CoursesFragment extends JPanel implements Fragment {
             }
 
         });
+
         coursesComboBox.addActionListener(new ActionListener() {
             // Xử lý sự kiện chọn môn học
             @Override
@@ -169,9 +204,10 @@ public class CoursesFragment extends JPanel implements Fragment {
 
         });
 
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         add(bottomPanel, BorderLayout.PAGE_END);
 
+        bottomPanel.add(removeButton);
         bottomPanel.add(addButton);
         bottomPanel.setBackground(bottomPanel.getParent().getBackground());
         // Hiển thị thông tin giáo vụ
@@ -192,6 +228,8 @@ public class CoursesFragment extends JPanel implements Fragment {
             @Override
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
+                removeButton.setEnabled(true);
+                selectedStudentIndex = getSelectedRow();
             }
         };
         studentTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
