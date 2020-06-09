@@ -8,7 +8,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Embeddable
-public class RegistrationPK implements Serializable {
+public class RegistrationOfStudent implements Serializable {
 
     /**
      *
@@ -22,10 +22,10 @@ public class RegistrationPK implements Serializable {
     @JoinColumn(name = "courseId")
     private Course course;
 
-    public RegistrationPK() {
+    public RegistrationOfStudent() {
     }
 
-    public RegistrationPK(Student student, Course course) {
+    public RegistrationOfStudent(Student student, Course course) {
         this.student = student;
         this.course = course;
     }
@@ -46,12 +46,12 @@ public class RegistrationPK implements Serializable {
         this.course = course;
     }
 
-    public RegistrationPK student(Student student) {
+    public RegistrationOfStudent student(Student student) {
         this.student = student;
         return this;
     }
 
-    public RegistrationPK course(Course course) {
+    public RegistrationOfStudent course(Course course) {
         this.course = course;
         return this;
     }
@@ -60,10 +60,10 @@ public class RegistrationPK implements Serializable {
     public boolean equals(Object o) {
         if (o == this)
             return true;
-        if (!(o instanceof RegistrationPK)) {
+        if (!(o instanceof RegistrationOfStudent)) {
             return false;
         }
-        RegistrationPK registrationPK = (RegistrationPK) o;
+        RegistrationOfStudent registrationPK = (RegistrationOfStudent) o;
         return Objects.equals(student, registrationPK.student) && Objects.equals(course, registrationPK.course);
     }
 

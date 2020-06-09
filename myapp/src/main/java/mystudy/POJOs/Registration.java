@@ -9,24 +9,24 @@ import javax.persistence.Table;
 public class Registration {
 
     @EmbeddedId
-    private RegistrationPK registration;
+    private RegistrationOfStudent registration;
 
     public Registration() {
     }
 
-    public Registration(RegistrationPK registration) {
+    public Registration(RegistrationOfStudent registration) {
         this.registration = registration;
     }
 
-    public RegistrationPK getRegistration() {
+    public RegistrationOfStudent getRegistration() {
         return this.registration;
     }
 
-    public void setRegistration(RegistrationPK registration) {
+    public void setRegistration(RegistrationOfStudent registration) {
         this.registration = registration;
     }
 
-    public Registration registration(RegistrationPK registration) {
+    public Registration registration(RegistrationOfStudent registration) {
         this.registration = registration;
         return this;
     }

@@ -54,17 +54,13 @@ drop table results;
 create table results(
 	studentId varchar(10) not null,
     courseId varchar(10) not null,
-    midSemesterGrade float not null,
+    midTermGrade float not null,
     finalExamGrade float not null,
     otherGrade float not null,
-    GPA float not null,
+    totalGrade float not null,
     constraint primary key(studentId, courseId),
-    constraint foreign key(studentId) references students(studentId),
-    constraint foreign key(courseId) references courses(courseId)
-    
+    constraint foreign key(studentId, courseId) references registrations(studentId, courseId)
 );
 
 insert into users values ("giaovu", "giaovu", 0, null);
-insert into classes values ("17CTT3");
-insert into students values ("1712368", "Nguyễn Hữu Dũng", "Nam", "123456789", "17CTT3");
-insert into users values ("1712368", "1712368", 1, "1712368");
+

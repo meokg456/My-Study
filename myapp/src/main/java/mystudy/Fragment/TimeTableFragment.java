@@ -47,7 +47,7 @@ import mystudy.Fonts.Fonts;
 import mystudy.POJOs.Class;
 import mystudy.POJOs.Course;
 import mystudy.POJOs.Registration;
-import mystudy.POJOs.RegistrationPK;
+import mystudy.POJOs.RegistrationOfStudent;
 import mystudy.POJOs.Student;
 import mystudy.POJOs.TimeTable;
 import mystudy.POJOs.TimeTablePK;
@@ -180,7 +180,8 @@ public class TimeTableFragment extends JPanel implements Fragment {
                                 transaction.commit();
 
                                 for (Student student : students) {
-                                    Registration registration = new Registration(new RegistrationPK(student, course));
+                                    Registration registration = new Registration(
+                                            new RegistrationOfStudent(student, course));
                                     transaction = session.beginTransaction();
                                     session.save(registration);
                                     transaction.commit();

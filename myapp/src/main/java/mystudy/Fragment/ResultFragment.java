@@ -1,5 +1,6 @@
 package mystudy.Fragment;
 
+import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -8,16 +9,24 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -25,6 +34,8 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellEditor;
+import javax.swing.text.JTextComponent;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -38,16 +49,19 @@ import mystudy.Components.MyTextField;
 import mystudy.Components.RoundedBorder;
 import mystudy.Components.RoundedButton;
 import mystudy.Components.ComboBox.ComboBoxRenderer;
-import mystudy.Components.Table.StudentListModel;
+import mystudy.Components.Table.ResultListModel;
 import mystudy.Connector.DatabaseService;
 import mystudy.Fonts.Fonts;
 import mystudy.POJOs.Class;
 import mystudy.POJOs.Course;
 import mystudy.POJOs.Registration;
 import mystudy.POJOs.RegistrationOfStudent;
+import mystudy.POJOs.Result;
 import mystudy.POJOs.Student;
+import mystudy.POJOs.TimeTable;
+import mystudy.POJOs.TimeTablePK;
 
-public class CoursesFragment extends JPanel implements Fragment {
+public class ResultFragment extends JPanel implements Fragment {
 
     /**
      *
@@ -58,8 +72,10 @@ public class CoursesFragment extends JPanel implements Fragment {
     private Course selectedCourse = null;
     private Student addingStudent = null;
     private int selectedStudentIndex = -1;
+    private boolean isUpdating = false;
+    private MyTable resultTable;
 
-    public CoursesFragment() {
+    public ResultFragment() {
         setBackground(Colors.getBackground());
     }
 
@@ -68,11 +84,11 @@ public class CoursesFragment extends JPanel implements Fragment {
         removeAll();
         // Khởi tạo trước các session dữ liệu set border cho fragment
         Session session = DatabaseService.getInstance().getSession();
-        List<Student> students = new ArrayList<>();
+        List<Result> results = new ArrayList<>();
         Vector<Class> classes = new Vector<>();
         Vector<Course> courses = new Vector<>();
         setLayout(new BorderLayout(0, 20));
-        TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30), "Courses");
+        TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30), "Results");
         titledBorder.setTitleJustification(TitledBorder.CENTER);
         titledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.BOLD, 36));
         titledBorder.setTitleColor(Colors.getTextColor());
@@ -82,7 +98,7 @@ public class CoursesFragment extends JPanel implements Fragment {
         // Lấy danh sách lớp
         classes.addAll(session.createQuery("from Class c ORDER BY c.className", Class.class).list());
 
-        StudentListModel model = new StudentListModel(students);
+        ResultListModel model = new ResultListModel(results);
 
         JPanel topPanel = new JPanel(new BorderLayout(30, 0));
         add(topPanel, BorderLayout.PAGE_START);
@@ -116,11 +132,11 @@ public class CoursesFragment extends JPanel implements Fragment {
             selectedCourse = (Course) coursesComboBox.getSelectedItem();
         }
 
-        students.addAll(fetchStudentFromCourse(session, selectedCourse));
+        results.addAll(fetchResultFromCourse(session, selectedCourse));
         coursesComboBox.setSelectedItem(selectedCourse);
 
-        // Tạo nút thêm sinh viên mới
-        RoundedButton addButton = new RoundedButton("Add student", 50, 24) {
+        // Tạo nút import kết quả học tập
+        RoundedButton importButton = new RoundedButton("Import results", 50, 24) {
             /**
              *
              */
@@ -129,14 +145,102 @@ public class CoursesFragment extends JPanel implements Fragment {
             @Override
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
-                // Hiển thị màn hình tìm kiếm sinh viên
-                buildAddStudentFormView();
+                JFileChooser fileChooser = new JFileChooser();
+                if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+
+                    try {
+                        FileReader fileReader = new FileReader(file);
+                        BufferedReader reader = new BufferedReader(fileReader);
+                        String line = reader.readLine().split(",")[0].replace("\uFEFF", "");
+                        String[] args = line.split("[-–]");
+                        System.out.println(args.length);
+                        System.out.println(args[0]);
+                        if (args.length != 2) {
+                            JOptionPane.showMessageDialog(null, "File content isn't have a correct format",
+                                    "Invalid file", JOptionPane.ERROR_MESSAGE);
+                            reader.close();
+                            return;
+                        }
+                        Class importingClass = session.find(Class.class, args[0]);
+                        if (importingClass == null) {
+                            JOptionPane.showMessageDialog(null, "Class dosen't existed", "Class not found",
+                                    JOptionPane.ERROR_MESSAGE);
+                            reader.close();
+                            return;
+                        }
+                        Course importingCourse = session.find(Course.class, args[1]);
+                        if (importingCourse == null) {
+                            JOptionPane.showMessageDialog(null, "Course dosen't existed", "Course not found",
+                                    JOptionPane.ERROR_MESSAGE);
+                            reader.close();
+                            return;
+                        }
+                        TimeTablePK timeTablePK = new TimeTablePK(importingClass, importingCourse);
+                        TimeTable timeTable = session.find(TimeTable.class, timeTablePK);
+                        if (timeTable == null) {
+                            JOptionPane.showMessageDialog(null,
+                                    "Course dosen't existed in " + importingClass.getClassName(), "Course not found",
+                                    JOptionPane.ERROR_MESSAGE);
+                            reader.close();
+                            return;
+                        }
+
+                        // Bỏ dòng title
+                        line = reader.readLine();
+                        List<Student> unregisteredStudents = new ArrayList<>();
+                        while ((line = reader.readLine()) != null) {
+                            args = line.split(",");
+                            Student importingStudent = session.find(Student.class, args[1]);
+                            RegistrationOfStudent registrationOfStudent = new RegistrationOfStudent(importingStudent,
+                                    importingCourse);
+                            Registration registration = session.find(Registration.class, registrationOfStudent);
+
+                            if (registration == null) {
+                                unregisteredStudents.add(importingStudent);
+                            } else {
+                                Result result = new Result(registrationOfStudent, Float.parseFloat(args[3]),
+                                        Float.parseFloat(args[4]), Float.parseFloat(args[5]),
+                                        Float.parseFloat(args[6]));
+                                Transaction transaction = null;
+                                try {
+                                    transaction = session.beginTransaction();
+                                    session.save(result);
+                                    transaction.commit();
+
+                                } catch (HibernateException ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+                        }
+                        if (unregisteredStudents.size() > 0) {
+                            StringBuilder stringBuilder = new StringBuilder();
+                            for (Student unregisteredStudent : unregisteredStudents) {
+                                stringBuilder.append(unregisteredStudent.getStudentId());
+                                stringBuilder.append(" - ");
+                                stringBuilder.append(unregisteredStudent.getName());
+                                stringBuilder.append(" doesn't registered in ");
+                                stringBuilder.append(importingClass.getClassName());
+                                stringBuilder.append(" - ");
+                                stringBuilder.append(importingCourse.getCourseId());
+                                stringBuilder.append("\n");
+                            }
+                            JOptionPane.showMessageDialog(null, stringBuilder.toString(), "Student not found",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                        reader.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+
+                }
 
             }
         };
-        addButton.setPreferredSize(new Dimension(200, 50));
+        importButton.setPreferredSize(new Dimension(200, 50));
+        topPanel.add(importButton, BorderLayout.LINE_END);
 
-        RoundedButton removeButton = new RoundedButton("Remove", 50, 24) {
+        RoundedButton updateButton = new RoundedButton("Edit", 50, 24) {
             /**
              *
              */
@@ -145,31 +249,11 @@ public class CoursesFragment extends JPanel implements Fragment {
             @Override
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
-                Student selectedStudent = students.get(selectedStudentIndex);
-                // Hiển thị form điền thông tin sinh viên mới
-                Registration registration = session.find(Registration.class,
-                        new RegistrationOfStudent(selectedStudent, selectedCourse));
-                if (registration == null) {
-                    JOptionPane.showMessageDialog(null, "Student doesn't existed!", "Student not found",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                Transaction transaction = null;
-                try {
-                    transaction = session.beginTransaction();
-                    session.remove(registration);
-                    transaction.commit();
-                    students.remove(selectedStudent);
-                    model.fireTableRowsDeleted(selectedStudentIndex, selectedStudentIndex);
-                    setEnabled(false);
-                } catch (HibernateException ex) {
-                    ex.printStackTrace();
-                }
+                isUpdating = true;
             }
         };
-        removeButton.setPreferredSize(new Dimension(200, 50));
-        removeButton.setEnabled(false);
+        updateButton.setPreferredSize(new Dimension(200, 50));
+        updateButton.setEnabled(false);
 
         classesComboBox.addActionListener(new ActionListener() {
             // Xử lý sự kiện chọn lớp
@@ -182,7 +266,6 @@ public class CoursesFragment extends JPanel implements Fragment {
                 selectedCourse = null;
                 courses.clear();
                 courses.addAll(fetchCourseFromClass(session, selectedClass));
-                addButton.setEnabled(false);
                 coursesComboBox.updateUI();
             }
 
@@ -192,13 +275,11 @@ public class CoursesFragment extends JPanel implements Fragment {
             // Xử lý sự kiện chọn môn học
             @Override
             public void actionPerformed(ActionEvent e) {
-                // lấy danh sách sinh viên tham gia môn học hiển thị lên
-                students.clear();
+                // lấy danh sách kết quả học tập của sinh viên tham gia môn học hiển thị lên
+                results.clear();
                 selectedCourse = (Course) coursesComboBox.getSelectedItem();
                 if (selectedCourse != null) {
-
-                    addButton.setEnabled(true);
-                    students.addAll(fetchStudentFromCourse(session, selectedCourse));
+                    results.addAll(fetchResultFromCourse(session, selectedCourse));
                 }
                 model.fireTableDataChanged();
             }
@@ -208,10 +289,8 @@ public class CoursesFragment extends JPanel implements Fragment {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         add(bottomPanel, BorderLayout.PAGE_END);
 
-        bottomPanel.add(removeButton);
-        bottomPanel.add(addButton);
+        bottomPanel.add(updateButton);
         bottomPanel.setBackground(bottomPanel.getParent().getBackground());
-        // Hiển thị thông tin giáo vụ
 
         CardPanel centerJPanel = new CardPanel(50);
         add(centerJPanel, BorderLayout.CENTER);
@@ -219,33 +298,53 @@ public class CoursesFragment extends JPanel implements Fragment {
         centerJPanel.setBorder(new EmptyBorder(20, 50, 20, 50));
         centerJPanel.setBackground(Colors.getPrimary());
 
-        // Tạo bảng hiển thị thông tin sinh viên
-        MyTable studentTable = new MyTable(model) {
+        // Tạo bảng hiển thị kết quả học tập của sinh viên
+        resultTable = new MyTable(model) {
             /**
              *
              */
             private static final long serialVersionUID = 1L;
 
             @Override
+            public boolean isCellEditable(int row, int column) {
+                if (column > 2 && getSelectedRow() == row && isUpdating)
+                    return true;
+                return false;
+            }
+
+            @Override
+            public Component prepareEditor(TableCellEditor editor, int row, int column) {
+                JTextComponent c = (JTextComponent) super.prepareEditor(editor, row, column);
+                c.setBackground(Colors.getBackground());
+                c.setForeground(Colors.getTextColor());
+                c.setCaretColor(Colors.getTextColor());
+                c.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+                return c;
+            }
+
+            @Override
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
-                removeButton.setEnabled(true);
+                updateButton.setEnabled(true);
                 selectedStudentIndex = getSelectedRow();
+                isUpdating = false;
             }
         };
-        studentTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        studentTable.setFillsViewportHeight(true);
+        resultTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        resultTable.setFillsViewportHeight(true);
         DefaultTableCellRenderer textRenderer = new DefaultTableCellRenderer();
         textRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         textRenderer.setBorder(new EmptyBorder(10, 10, 10, 10));
-        studentTable.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
-        studentTable.getColumn("No.").setCellRenderer(textRenderer);
-        studentTable.getColumn("Student ID").setCellRenderer(textRenderer);
-        studentTable.getColumn("Full name").setCellRenderer(textRenderer);
-        studentTable.getColumn("Gender").setCellRenderer(textRenderer);
-        studentTable.getColumn("Personal ID").setCellRenderer(textRenderer);
-        studentTable.setRowHeight(50);
-        JScrollPane scrollPane = new JScrollPane(studentTable);
+        resultTable.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+        resultTable.getColumn("No.").setCellRenderer(textRenderer);
+        resultTable.getColumn("Student ID").setCellRenderer(textRenderer);
+        resultTable.getColumn("Full name").setCellRenderer(textRenderer);
+        resultTable.getColumn("Mid-term").setCellRenderer(textRenderer);
+        resultTable.getColumn("Final exam").setCellRenderer(textRenderer);
+        resultTable.getColumn("Other grade").setCellRenderer(textRenderer);
+        resultTable.getColumn("Total grade").setCellRenderer(textRenderer);
+        resultTable.setRowHeight(50);
+        JScrollPane scrollPane = new JScrollPane(resultTable);
         centerJPanel.add(scrollPane);
         validate();
         repaint();
@@ -263,11 +362,11 @@ public class CoursesFragment extends JPanel implements Fragment {
         setBorder(new CompoundBorder(new EmptyBorder(150, 250, 150, 250),
                 (new CompoundBorder(titledBorder, new EmptyBorder(30, 50, 30, 50)))));
 
-        CardPanel studentInfoPanel = new CardPanel(50);
-        studentInfoPanel.setBorder(new EmptyBorder(30, 10, 10, 10));
-        add(studentInfoPanel, BorderLayout.CENTER);
-        studentInfoPanel.setBackground(Colors.getPrimary());
-        studentInfoPanel.setLayout(new BoxLayout(studentInfoPanel, BoxLayout.Y_AXIS));
+        CardPanel resultInfoPanel = new CardPanel(50);
+        resultInfoPanel.setBorder(new EmptyBorder(30, 10, 10, 10));
+        add(resultInfoPanel, BorderLayout.CENTER);
+        resultInfoPanel.setBackground(Colors.getPrimary());
+        resultInfoPanel.setLayout(new BoxLayout(resultInfoPanel, BoxLayout.Y_AXIS));
         // Hiển thị lớp và môn đang chọn đang chọn
         JLabel classNameLabel = new JLabel(selectedClass.getClassName() + " - " + selectedCourse.getCourseId());
         classNameLabel.setFont(new Font(Fonts.getFont().getName(), Font.BOLD, 40));
@@ -277,7 +376,7 @@ public class CoursesFragment extends JPanel implements Fragment {
         courseNameLabel.setFont(new Font(Fonts.getFont().getName(), Font.BOLD, 36));
         courseNameLabel.setForeground(Colors.getTextColor());
         // Điền mssv sinh viên
-        MyTextField studentIDTextField = new MyTextField("Student ID", Colors.getTextColor(), 24);
+        MyTextField resultIDTextField = new MyTextField("Student ID", Colors.getTextColor(), 24);
 
         RoundedButton addButton = new RoundedButton("Confirm", 50, 24) {
 
@@ -320,62 +419,62 @@ public class CoursesFragment extends JPanel implements Fragment {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                String studentId = studentIDTextField.getText();
-                if (studentId.equals("")) {
-                    JOptionPane.showMessageDialog(null, "Student ID can not be empty!", "Empty student ID",
+                String resultId = resultIDTextField.getText();
+                if (resultId.equals("")) {
+                    JOptionPane.showMessageDialog(null, "Student ID can not be empty!", "Empty result ID",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                Student student = session.find(Student.class, studentId);
-                if (student == null) {
+                Student result = session.find(Student.class, resultId);
+                if (result == null) {
                     JOptionPane.showMessageDialog(null, "Student doesn't existed!", "Student not found",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                addingStudent = student;
+                addingStudent = result;
                 addButton.setEnabled(true);
 
-                studentInfoPanel.add(Box.createRigidArea(new Dimension(10, 20)));
-                Box studentInfoRow = Box.createHorizontalBox();
-                studentInfoPanel.add(studentInfoRow);
+                resultInfoPanel.add(Box.createRigidArea(new Dimension(10, 20)));
+                Box resultInfoRow = Box.createHorizontalBox();
+                resultInfoPanel.add(resultInfoRow);
 
-                Box studentInfoFirstColumn = Box.createVerticalBox();
-                studentInfoRow.add(studentInfoFirstColumn);
+                Box resultInfoFirstColumn = Box.createVerticalBox();
+                resultInfoRow.add(resultInfoFirstColumn);
 
-                studentInfoFirstColumn.setAlignmentX(Component.LEFT_ALIGNMENT);
+                resultInfoFirstColumn.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-                studentInfoRow.add(Box.createRigidArea(new Dimension(40, 10)));
+                resultInfoRow.add(Box.createRigidArea(new Dimension(40, 10)));
 
-                Box studentInfoSecondColumn = Box.createVerticalBox();
-                studentInfoRow.add(studentInfoSecondColumn);
+                Box resultInfoSecondColumn = Box.createVerticalBox();
+                resultInfoRow.add(resultInfoSecondColumn);
 
-                studentInfoSecondColumn.setAlignmentX(Component.LEFT_ALIGNMENT);
+                resultInfoSecondColumn.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-                JLabel studentIdLabel = new JLabel("Student ID: " + student.getStudentId());
-                studentIdLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
-                studentIdLabel.setForeground(Colors.getTextColor());
-                studentInfoFirstColumn.add(studentIdLabel);
+                JLabel resultIdLabel = new JLabel("Student ID: " + result.getStudentId());
+                resultIdLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+                resultIdLabel.setForeground(Colors.getTextColor());
+                resultInfoFirstColumn.add(resultIdLabel);
 
-                studentInfoFirstColumn.add(Box.createRigidArea(new Dimension(0, 10)));
+                resultInfoFirstColumn.add(Box.createRigidArea(new Dimension(0, 10)));
 
-                JLabel studentNameLabel = new JLabel("Full name: " + student.getName());
-                studentNameLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
-                studentNameLabel.setForeground(Colors.getTextColor());
-                studentInfoSecondColumn.add(studentNameLabel);
+                JLabel resultNameLabel = new JLabel("Full name: " + result.getName());
+                resultNameLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+                resultNameLabel.setForeground(Colors.getTextColor());
+                resultInfoSecondColumn.add(resultNameLabel);
 
-                studentInfoSecondColumn.add(Box.createRigidArea(new Dimension(0, 10)));
+                resultInfoSecondColumn.add(Box.createRigidArea(new Dimension(0, 10)));
 
-                JLabel studentGenderLabel = new JLabel("Gender: " + student.getGender());
-                studentGenderLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
-                studentGenderLabel.setForeground(Colors.getTextColor());
-                studentInfoFirstColumn.add(studentGenderLabel);
+                JLabel resultGenderLabel = new JLabel("Gender: " + result.getGender());
+                resultGenderLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+                resultGenderLabel.setForeground(Colors.getTextColor());
+                resultInfoFirstColumn.add(resultGenderLabel);
 
-                JLabel studentPersonalIdLabel = new JLabel("Personal ID: " + student.getPersonalId());
-                studentPersonalIdLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
-                studentPersonalIdLabel.setForeground(Colors.getTextColor());
-                studentInfoSecondColumn.add(studentPersonalIdLabel);
+                JLabel resultPersonalIdLabel = new JLabel("Personal ID: " + result.getPersonalId());
+                resultPersonalIdLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+                resultPersonalIdLabel.setForeground(Colors.getTextColor());
+                resultInfoSecondColumn.add(resultPersonalIdLabel);
 
-                studentInfoPanel.updateUI();
+                resultInfoPanel.updateUI();
 
             }
         };
@@ -393,18 +492,18 @@ public class CoursesFragment extends JPanel implements Fragment {
         topPanel.add(firstColumnBox, BorderLayout.PAGE_START);
         Box searchBarBox = Box.createHorizontalBox();
         Box secondColumnBox = Box.createVerticalBox();
-        searchBarBox.add(studentIDTextField);
+        searchBarBox.add(resultIDTextField);
         searchBarBox.add(Box.createRigidArea(new Dimension(20, 0)));
         searchBarBox.add(secondColumnBox);
         secondColumnBox.add(Box.createRigidArea(new Dimension(0, 18)));
         secondColumnBox.add(searchButton);
         topPanel.add(searchBarBox, BorderLayout.LINE_END);
-        studentIDTextField.setMaximumSize(new Dimension(300, 95));
-        studentIDTextField.setPreferredSize(new Dimension(300, 95));
+        resultIDTextField.setMaximumSize(new Dimension(300, 95));
+        resultIDTextField.setPreferredSize(new Dimension(300, 95));
 
         // Tiêu đề Information
         Box informationBox = Box.createHorizontalBox();
-        studentInfoPanel.add(informationBox);
+        resultInfoPanel.add(informationBox);
         JLabel informationLabel = new JLabel("Student Information");
         informationBox.add(informationLabel);
         informationLabel.setFont(new Font(Fonts.getFont().getName(), Font.BOLD, 28));
@@ -448,16 +547,15 @@ public class CoursesFragment extends JPanel implements Fragment {
         return courses;
     }
 
-    private List<Student> fetchStudentFromCourse(Session session, Course fromCourse) {
-        List<Student> students = new ArrayList<>();
-        Query<Student> query = session.createQuery(
-                "select r.registration.student from Registration r where r.registration.course = :Course",
-                Student.class);
+    private List<Result> fetchResultFromCourse(Session session, Course fromCourse) {
+        List<Result> results = new ArrayList<>();
+        Query<Result> query = session.createQuery("select r from Result r where r.registration.course = :Course",
+                Result.class);
         query.setParameter("Course", fromCourse);
 
-        students.addAll(query.list());
+        results.addAll(query.list());
         session.clear();
-        return students;
+        return results;
     }
 
     @Override

@@ -86,4 +86,10 @@ public class Student implements Serializable {
         this.className = className;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        Student student = (Student) obj;
+        return student.getStudentId().equals(studentId);
+    }
+
 }

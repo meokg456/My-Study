@@ -16,5 +16,6 @@
         <mapping class="mystudy.POJOs.TimeTable" />
         <mapping class="mystudy.POJOs.Course" />
         <mapping class="mystudy.POJOs.Registration" />
+        <mapping class="mystudy.POJOs.Result" />
     </session-factory>
 </hibernate-configuration>
