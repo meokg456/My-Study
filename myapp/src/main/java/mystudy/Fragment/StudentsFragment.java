@@ -395,6 +395,7 @@ public class StudentsFragment extends JPanel implements Fragment {
 
                     transaction = session.beginTransaction();
                     session.save(student);
+                    session.save(new User(studentId, studentId, Permission.STUDENT, student));
                     transaction.commit();
                     JOptionPane.showMessageDialog(null,
                             "New student has been add to class " + selectedClass.getClassName(), "Success!",

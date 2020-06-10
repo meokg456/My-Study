@@ -24,7 +24,7 @@ public class User implements Serializable {
     @Column(name = "permission", nullable = false)
     private Permission permission;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "studentId")
     private Student student;
 
