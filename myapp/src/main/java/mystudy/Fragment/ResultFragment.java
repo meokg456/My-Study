@@ -2,12 +2,15 @@ package mystudy.Fragment;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,6 +36,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.text.JTextComponent;
@@ -254,6 +259,7 @@ public class ResultFragment extends JPanel implements Fragment {
         };
         updateButton.setPreferredSize(new Dimension(200, 50));
         updateButton.setEnabled(false);
+        updateButton.setToolTipText("Edit inline");
 
         classesComboBox.addActionListener(new ActionListener() {
             // Xử lý sự kiện chọn lớp
@@ -307,7 +313,7 @@ public class ResultFragment extends JPanel implements Fragment {
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                if (column > 2 && getSelectedRow() == row && isUpdating)
+                if (column > 2 && column < 7 && getSelectedRow() == row && isUpdating)
                     return true;
                 return false;
             }
@@ -336,202 +342,103 @@ public class ResultFragment extends JPanel implements Fragment {
         textRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         textRenderer.setBorder(new EmptyBorder(10, 10, 10, 10));
         resultTable.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
-        resultTable.getColumn("No.").setCellRenderer(textRenderer);
+        var noColumn = resultTable.getColumn("No.");
+        noColumn.setCellRenderer(textRenderer);
+        noColumn.setMaxWidth(70);
         resultTable.getColumn("Student ID").setCellRenderer(textRenderer);
         resultTable.getColumn("Full name").setCellRenderer(textRenderer);
         resultTable.getColumn("Mid-term").setCellRenderer(textRenderer);
         resultTable.getColumn("Final exam").setCellRenderer(textRenderer);
         resultTable.getColumn("Other grade").setCellRenderer(textRenderer);
         resultTable.getColumn("Total grade").setCellRenderer(textRenderer);
+        resultTable.getColumn("Result").setCellRenderer(new DefaultTableCellRenderer() {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                String result = (String) value;
+                if (result.equals("Passed")) {
+                    c.setForeground(Color.green);
+                } else {
+                    c.setForeground(Color.red);
+                }
+                return c;
+            }
+        });
         resultTable.setRowHeight(50);
         JScrollPane scrollPane = new JScrollPane(resultTable);
         centerJPanel.add(scrollPane);
-        validate();
-        repaint();
-    }
+        JPanel statisticPanel = new JPanel();
+        statisticPanel.setBorder(new CompoundBorder(new RoundedBorder(Colors.getTextColor(), 2, true, 50),
+                new EmptyBorder(10, 10, 10, 10)));
+        centerJPanel.add(Box.createRigidArea(new Dimension(20, 20)));
+        centerJPanel.add(statisticPanel);
+        statisticPanel.setBackground(statisticPanel.getParent().getBackground());
+        int passedStudent = 0;
+        int failedStudent = 0;
+        // Thống kê số liệu
+        for (int i = 0; i < results.size(); i++) {
+            if (((String) model.getValueAt(i, 7)).equals("Passed")) {
+                passedStudent++;
+            } else {
+                failedStudent++;
+            }
+        }
+        JLabel passedLabel = new JLabel("Passed: " + passedStudent);
+        statisticPanel.add(passedLabel);
+        statisticPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        passedLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+        passedLabel.setForeground(Colors.getTextColor());
 
-    private void buildAddStudentFormView() {
-        Session session = DatabaseService.getInstance().getSession();
-        removeAll();
-        // Set lại border
-        setLayout(new BorderLayout(0, 20));
-        TitledBorder titledBorder = new TitledBorder(new RoundedBorder(Colors.getPrimary(), 2, true, 30), "Courses");
-        titledBorder.setTitleJustification(TitledBorder.CENTER);
-        titledBorder.setTitleFont(new Font(Fonts.getFont().getName(), Font.BOLD, 30));
-        titledBorder.setTitleColor(Colors.getTextColor());
-        setBorder(new CompoundBorder(new EmptyBorder(150, 250, 150, 250),
-                (new CompoundBorder(titledBorder, new EmptyBorder(30, 50, 30, 50)))));
+        statisticPanel.add(Box.createRigidArea(new Dimension(50, 50)));
 
-        CardPanel resultInfoPanel = new CardPanel(50);
-        resultInfoPanel.setBorder(new EmptyBorder(30, 10, 10, 10));
-        add(resultInfoPanel, BorderLayout.CENTER);
-        resultInfoPanel.setBackground(Colors.getPrimary());
-        resultInfoPanel.setLayout(new BoxLayout(resultInfoPanel, BoxLayout.Y_AXIS));
-        // Hiển thị lớp và môn đang chọn đang chọn
-        JLabel classNameLabel = new JLabel(selectedClass.getClassName() + " - " + selectedCourse.getCourseId());
-        classNameLabel.setFont(new Font(Fonts.getFont().getName(), Font.BOLD, 40));
-        classNameLabel.setForeground(Colors.getTextColor());
+        JLabel passedRateLabel = new JLabel(
+                "Passed rate: " + (results.size() == 0 ? "100" : passedStudent / results.size() * 100) + "%");
+        statisticPanel.add(passedRateLabel);
+        passedRateLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+        passedRateLabel.setForeground(Colors.getTextColor());
 
-        JLabel courseNameLabel = new JLabel(selectedCourse.getCourseName());
-        courseNameLabel.setFont(new Font(Fonts.getFont().getName(), Font.BOLD, 36));
-        courseNameLabel.setForeground(Colors.getTextColor());
-        // Điền mssv sinh viên
-        MyTextField resultIDTextField = new MyTextField("Student ID", Colors.getTextColor(), 24);
+        statisticPanel.add(Box.createRigidArea(new Dimension(50, 50)));
 
-        RoundedButton addButton = new RoundedButton("Confirm", 50, 24) {
+        JLabel failedLabel = new JLabel("Failed: " + failedStudent);
+        statisticPanel.add(failedLabel);
+        failedLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+        failedLabel.setForeground(Colors.getTextColor());
 
-            /**
-             *
-             */
-            private static final long serialVersionUID = 1L;
+        statisticPanel.add(Box.createRigidArea(new Dimension(50, 50)));
+
+        JLabel failedRateLabel = new JLabel(
+                "Failed rate: " + (results.size() == 0 ? "100" : failedStudent / results.size() * 100) + "%");
+        statisticPanel.add(failedRateLabel);
+        failedRateLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+        failedRateLabel.setForeground(Colors.getTextColor());
+
+        resultTable.getModel().addTableModelListener(new TableModelListener() {
 
             @Override
-            public void mouseReleased(MouseEvent e) {
-                super.mouseReleased(e);
-                Registration registration = session.find(Registration.class,
-                        new RegistrationOfStudent(addingStudent, selectedCourse));
-                if (registration != null) {
-                    JOptionPane.showMessageDialog(null, "Student already registered this course!", "Student registered",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
+            public void tableChanged(TableModelEvent e) {
+                int passedStudent = 0;
+                int failedStudent = 0;
+                for (int i = 0; i < results.size(); i++) {
+                    if (((String) model.getValueAt(i, 7)).equals("Passed")) {
+                        passedStudent++;
+                    } else {
+                        failedStudent++;
+                    }
                 }
-                Registration newRegistration = new Registration(
-                        new RegistrationOfStudent(addingStudent, selectedCourse));
-                Transaction transaction = null;
-
-                try {
-                    transaction = session.beginTransaction();
-                    session.save(newRegistration);
-                    transaction.commit();
-                    build();
-                } catch (HibernateException ex) {
-                    ex.printStackTrace();
-                }
+                failedLabel.setText("Failed: " + failedStudent);
+                passedLabel.setText("Passed: " + passedStudent);
+                failedRateLabel.setText("Failed rate: "
+                        + (results.size() == 0 ? "100" : failedStudent * 1.0 / results.size() * 100) + "%");
+                passedRateLabel.setText("Passed rate: "
+                        + (results.size() == 0 ? "100" : passedStudent * 1.0 / results.size() * 100) + "%");
             }
-        };
-        addButton.setEnabled(false);
-
-        RoundedButton searchButton = new RoundedButton("Search", 50, 24) {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                String resultId = resultIDTextField.getText();
-                if (resultId.equals("")) {
-                    JOptionPane.showMessageDialog(null, "Student ID can not be empty!", "Empty result ID",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                Student result = session.find(Student.class, resultId);
-                if (result == null) {
-                    JOptionPane.showMessageDialog(null, "Student doesn't existed!", "Student not found",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                addingStudent = result;
-                addButton.setEnabled(true);
-
-                resultInfoPanel.add(Box.createRigidArea(new Dimension(10, 20)));
-                Box resultInfoRow = Box.createHorizontalBox();
-                resultInfoPanel.add(resultInfoRow);
-
-                Box resultInfoFirstColumn = Box.createVerticalBox();
-                resultInfoRow.add(resultInfoFirstColumn);
-
-                resultInfoFirstColumn.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-                resultInfoRow.add(Box.createRigidArea(new Dimension(40, 10)));
-
-                Box resultInfoSecondColumn = Box.createVerticalBox();
-                resultInfoRow.add(resultInfoSecondColumn);
-
-                resultInfoSecondColumn.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-                JLabel resultIdLabel = new JLabel("Student ID: " + result.getStudentId());
-                resultIdLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
-                resultIdLabel.setForeground(Colors.getTextColor());
-                resultInfoFirstColumn.add(resultIdLabel);
-
-                resultInfoFirstColumn.add(Box.createRigidArea(new Dimension(0, 10)));
-
-                JLabel resultNameLabel = new JLabel("Full name: " + result.getName());
-                resultNameLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
-                resultNameLabel.setForeground(Colors.getTextColor());
-                resultInfoSecondColumn.add(resultNameLabel);
-
-                resultInfoSecondColumn.add(Box.createRigidArea(new Dimension(0, 10)));
-
-                JLabel resultGenderLabel = new JLabel("Gender: " + result.getGender());
-                resultGenderLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
-                resultGenderLabel.setForeground(Colors.getTextColor());
-                resultInfoFirstColumn.add(resultGenderLabel);
-
-                JLabel resultPersonalIdLabel = new JLabel("Personal ID: " + result.getPersonalId());
-                resultPersonalIdLabel.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
-                resultPersonalIdLabel.setForeground(Colors.getTextColor());
-                resultInfoSecondColumn.add(resultPersonalIdLabel);
-
-                resultInfoPanel.updateUI();
-
-            }
-        };
-        searchButton.setPreferredSize(new Dimension(200, 50));
-        searchButton.setMaximumSize(new Dimension(200, 50));
-
-        // Hiển thị tên lớp và môn học
-        JPanel topPanel = new JPanel(new BorderLayout());
-        add(topPanel, BorderLayout.PAGE_START);
-        topPanel.setBackground(topPanel.getParent().getBackground());
-        Box firstColumnBox = Box.createVerticalBox();
-        firstColumnBox.add(classNameLabel);
-        firstColumnBox.add(courseNameLabel);
-        firstColumnBox.setAlignmentX(Component.CENTER_ALIGNMENT);
-        topPanel.add(firstColumnBox, BorderLayout.PAGE_START);
-        Box searchBarBox = Box.createHorizontalBox();
-        Box secondColumnBox = Box.createVerticalBox();
-        searchBarBox.add(resultIDTextField);
-        searchBarBox.add(Box.createRigidArea(new Dimension(20, 0)));
-        searchBarBox.add(secondColumnBox);
-        secondColumnBox.add(Box.createRigidArea(new Dimension(0, 18)));
-        secondColumnBox.add(searchButton);
-        topPanel.add(searchBarBox, BorderLayout.LINE_END);
-        resultIDTextField.setMaximumSize(new Dimension(300, 95));
-        resultIDTextField.setPreferredSize(new Dimension(300, 95));
-
-        // Tiêu đề Information
-        Box informationBox = Box.createHorizontalBox();
-        resultInfoPanel.add(informationBox);
-        JLabel informationLabel = new JLabel("Student Information");
-        informationBox.add(informationLabel);
-        informationLabel.setFont(new Font(Fonts.getFont().getName(), Font.BOLD, 28));
-        informationLabel.setForeground(Colors.getTextColor());
-
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
-        add(bottomPanel, BorderLayout.PAGE_END);
-        bottomPanel.setBackground(getParent().getBackground());
-        // Nút quay lại
-        RoundedButton backButton = new RoundedButton("Back", 50, 24) {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                super.mouseReleased(e);
-                build();
-            }
-        };
-        bottomPanel.add(backButton);
-        backButton.setPreferredSize(new Dimension(200, 50));
-        // Nút xác nhận
-
-        bottomPanel.add(addButton);
-        addButton.setPreferredSize(new Dimension(200, 50));
-
+        });
         validate();
         repaint();
     }

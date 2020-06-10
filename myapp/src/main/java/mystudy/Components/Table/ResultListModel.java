@@ -1,7 +1,10 @@
 package mystudy.Components.Table;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.util.List;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
@@ -9,7 +12,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import mystudy.Colors.Colors;
 import mystudy.Connector.DatabaseService;
+import mystudy.Fonts.Fonts;
 import mystudy.POJOs.Result;
 import mystudy.POJOs.Student;
 
@@ -21,7 +26,7 @@ public class ResultListModel extends AbstractTableModel {
     private static final long serialVersionUID = 1L;
 
     private String[] columnNames = { "No.", "Student ID", "Full name", "Mid-term", "Final exam", "Other grade",
-            "Total grade" };
+            "Total grade", "Result" };
 
     private List<Result> results;
 
@@ -104,6 +109,8 @@ public class ResultListModel extends AbstractTableModel {
                 return result.getOtherGrade();
             case 6:
                 return result.getTotalGrade();
+            case 7:
+                return result.getTotalGrade() < 5.0 ? "Failed" : "Passed";
         }
         return result;
     }

@@ -41,11 +41,9 @@ public class MyTable extends JTable implements MouseInputListener {
     public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
         Component c = super.prepareRenderer(renderer, row, column);
         if ((isRowSelected(row) || (row == rollOverRowIndex))) {
-            c.setForeground(getSelectionForeground());
             c.setBackground(getSelectionBackground());
 
         } else {
-            c.setForeground(getForeground());
             c.setBackground(getBackground());
 
         }
