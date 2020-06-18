@@ -1,10 +1,7 @@
 package mystudy.Components.Table;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.util.List;
 
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
@@ -12,9 +9,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import mystudy.Colors.Colors;
 import mystudy.Connector.DatabaseService;
-import mystudy.Fonts.Fonts;
 import mystudy.POJOs.Result;
 import mystudy.POJOs.Student;
 

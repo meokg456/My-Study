@@ -1,11 +1,12 @@
 package mystudy.Components.ComboBox;
 
-import javax.swing.*;
-import javax.swing.plaf.ColorUIResource;
+import java.awt.Component;
+
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 
 import mystudy.Colors.Colors;
-
-import java.awt.*;
 
 public class ComboBoxRenderer extends JLabel implements ListCellRenderer<Object> {
     /**

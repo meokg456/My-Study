@@ -62,5 +62,28 @@ create table results(
     constraint foreign key(studentId, courseId) references registrations(studentId, courseId)
 );
 
+drop table reexamines;
+create table reexamines(
+	reexamineId varchar(100) not null primary key,
+    startDate Date not null,
+    endDate Date not null
+);
+
+drop table reexamine_requests;
+create table reexamine_requests(
+	courseId varchar(10) not null,
+    studentId varchar(10) not null,
+    reexamineId varchar(100) not null,
+    requestTime datetime not null,
+    requestStatus int not null,
+    gradeColumn int not null,
+    desireGrade float not null,
+    reason nvarchar(1000) not null,
+    constraint primary key(courseId, studentId),
+	constraint foreign key(studentId, courseId) references registrations(studentId, courseId),
+	constraint foreign key(reexamineId) references reexamines(reexamineId)
+);
+
+
 insert into users values ("giaovu", "giaovu", 0, null);
 

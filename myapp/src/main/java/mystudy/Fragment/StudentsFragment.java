@@ -49,6 +49,9 @@ import mystudy.Connector.DatabaseService;
 import mystudy.Enum.Permission;
 import mystudy.Fonts.Fonts;
 import mystudy.POJOs.Class;
+import mystudy.POJOs.Course;
+import mystudy.POJOs.Registration;
+import mystudy.POJOs.RegistrationOfStudent;
 import mystudy.POJOs.Student;
 import mystudy.POJOs.User;
 
@@ -137,15 +140,16 @@ public class StudentsFragment extends JPanel implements Fragment {
             public void actionPerformed(ActionEvent e) {
                 // lấy danh sách lớp hiển thị lên
                 selectedClass = (Class) classesComboBox.getSelectedItem();
-                Query<Student> query = session.createQuery(
-                        "select s from Student s where s.className = :class ORDER BY s.studentId", Student.class);
-                query.setParameter("class", selectedClass);
-                addButton.setEnabled(true);
-                students.clear();
-                students.addAll(query.list());
-                session.clear();
-                model.fireTableDataChanged();
-                addButton.setEnabled(true);
+                if (selectedClass != null) {
+                    Query<Student> query = session.createQuery(
+                            "select s from Student s where s.className = :class ORDER BY s.studentId", Student.class);
+                    query.setParameter("class", selectedClass);
+                    addButton.setEnabled(true);
+                    students.clear();
+                    students.addAll(query.list());
+                    session.clear();
+                    model.fireTableDataChanged();
+                }
             }
 
         });
@@ -389,13 +393,20 @@ public class StudentsFragment extends JPanel implements Fragment {
 
                 Student student = new Student(studentId, studentNameTextField.getText(),
                         (String) genderComboBox.getSelectedItem(), personalIDTextField.getText(), selectedClass);
-                System.out.println(student);
+                Query<Course> query = session.createQuery(
+                        "select t.courseInClass.course from TimeTable t where t.courseInClass.className = :class",
+                        Course.class);
+                query.setParameter("class", selectedClass);
+                List<Course> courses = query.list();
                 Transaction transaction = null;
                 try {
 
                     transaction = session.beginTransaction();
                     session.save(student);
                     session.save(new User(studentId, studentId, Permission.STUDENT, student));
+                    for (Course course : courses) {
+                        session.save(new Registration(new RegistrationOfStudent(student, course)));
+                    }
                     transaction.commit();
                     JOptionPane.showMessageDialog(null,
                             "New student has been add to class " + selectedClass.getClassName(), "Success!",

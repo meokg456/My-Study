@@ -103,7 +103,7 @@ public class CoursesFragment extends JPanel implements Fragment {
         // Lấy danh sách môn
         courses.addAll(fetchCourseFromClass(session, selectedClass));
         classesComboBox.setSelectedItem(selectedClass);
-        // Tạo Combobox chọn chọn môn
+        // Tạo Combobox chọn môn
         JComboBox<Course> coursesComboBox = new JComboBox<Course>(courses);
         topPanel.add(coursesComboBox, BorderLayout.CENTER);
         ComboBoxRenderer coursesComboBoxRenderer = new ComboBoxRenderer();
@@ -229,8 +229,10 @@ public class CoursesFragment extends JPanel implements Fragment {
             @Override
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
-                removeButton.setEnabled(true);
+
                 selectedStudentIndex = getSelectedRow();
+                if (selectedStudentIndex >= 0)
+                    removeButton.setEnabled(true);
             }
         };
         studentTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);

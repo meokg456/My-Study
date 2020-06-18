@@ -121,8 +121,10 @@ public class UsersFragment extends JPanel implements Fragment {
             @Override
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
-                resetButton.setEnabled(true);
                 selectedIndex = getSelectedRow();
+                if (selectedIndex >= 0)
+                    resetButton.setEnabled(true);
+
             }
         };
         accountTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
