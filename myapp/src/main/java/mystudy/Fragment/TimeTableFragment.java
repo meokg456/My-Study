@@ -24,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -43,6 +44,7 @@ import mystudy.Components.RoundedButton;
 import mystudy.Components.ComboBox.ComboBoxRenderer;
 import mystudy.Components.Table.TimeTableModel;
 import mystudy.Connector.DatabaseService;
+import mystudy.Enum.Permission;
 import mystudy.Fonts.Fonts;
 import mystudy.POJOs.Class;
 import mystudy.POJOs.Course;
@@ -51,6 +53,8 @@ import mystudy.POJOs.RegistrationOfStudent;
 import mystudy.POJOs.Student;
 import mystudy.POJOs.TimeTable;
 import mystudy.POJOs.TimeTablePK;
+import mystudy.POJOs.User;
+import mystudy.User.UserService;
 
 public class TimeTableFragment extends JPanel implements Fragment {
 
@@ -59,6 +63,7 @@ public class TimeTableFragment extends JPanel implements Fragment {
      */
     private static final long serialVersionUID = 1L;
     private Class selectedClass = null;
+    private User user = UserService.getInstance().getLoggedUser();
 
     public TimeTableFragment() {
         setBackground(Colors.getBackground());
@@ -88,6 +93,8 @@ public class TimeTableFragment extends JPanel implements Fragment {
         add(topPanel, BorderLayout.PAGE_START);
         topPanel.setBackground(topPanel.getParent().getBackground());
 
+        UIManager.put("ComboBox.disabledBackground", Colors.getPrimary());
+        UIManager.put("ComboBox.disabledForeground", Colors.getTextColor());
         // Tạo Combobox chọn lớp
         JComboBox<Class> classesComboBox = new JComboBox<Class>(classes);
         topPanel.add(classesComboBox, BorderLayout.LINE_START);
@@ -97,7 +104,9 @@ public class TimeTableFragment extends JPanel implements Fragment {
         classesComboBox.setForeground(Colors.getTextColor());
         classesComboBox.setPreferredSize(new Dimension(200, 50));
         classesComboBox.setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
-
+        if (user.getPermission().equals(Permission.STUDENT)) {
+            classesComboBox.setEnabled(false);
+        }
         if (selectedClass == null)
             selectedClass = (Class) classesComboBox.getSelectedItem();
 
@@ -259,16 +268,24 @@ public class TimeTableFragment extends JPanel implements Fragment {
 
     private List<Course> fetchCourses(Session session, Class fromClass) {
         List<Course> courses = new ArrayList<>();
-        // Lấy thời khóa biểu của lớp đã chọn
-        Query<TimeTable> query = session
-                .createQuery("select t from TimeTable t where t.courseInClass.className = :class ", TimeTable.class);
-        query.setParameter("class", fromClass);
-        var timeTable = query.list();
-        courses.clear();
-        for (TimeTable courseInClass : timeTable) {
-            courses.add(courseInClass.getCourseInClass().getCourse());
+
+        if (user.getPermission().equals(Permission.ADMIN)) {
+            // Lấy thời khóa biểu của lớp đã chọn
+            Query<TimeTable> query = session.createQuery(
+                    "select t from TimeTable t where t.courseInClass.className = :class ", TimeTable.class);
+            query.setParameter("class", fromClass);
+            var timeTable = query.list();
+            for (TimeTable courseInClass : timeTable) {
+                courses.add(courseInClass.getCourseInClass().getCourse());
+            }
+            session.clear();
+        } else {
+            Query<Course> query = session.createQuery(
+                    "select r.registration.course from Registration r where r.registration.student = :Student",
+                    Course.class);
+            query.setParameter("Student", user.getStudent());
+            courses.addAll(query.list());
         }
-        session.clear();
         return courses;
     }
 }

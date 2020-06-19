@@ -157,7 +157,13 @@ public class ReexamineFragment extends JPanel implements Fragment {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     super.mouseReleased(e);
-                    buildRequestFormView();
+                    Date date = new Date();
+                    if (date.compareTo(new Date(selectedReexamine.getEndDate().getTime())) < 0)
+                        buildRequestFormView();
+                    else {
+                        JOptionPane.showMessageDialog(null, "The reexamine is expired", "Expired",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             };
             topPanel.add(createReexamineButton, BorderLayout.LINE_END);
@@ -207,7 +213,7 @@ public class ReexamineFragment extends JPanel implements Fragment {
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                if (column == 4) {
+                if (column == 4 && user.getPermission().equals(Permission.ADMIN)) {
                     return true;
                 }
                 return false;
@@ -224,9 +230,10 @@ public class ReexamineFragment extends JPanel implements Fragment {
         requestTable.getColumn("Full name").setCellRenderer(textRenderer);
         requestTable.getColumn("Course name").setCellRenderer(textRenderer);
         RequestStatus[] requestStatus = { RequestStatus.SENT, RequestStatus.NO_UPDATED, RequestStatus.UPDATED };
-        StatusTableCellRenderer statusComboboxRenderer = new StatusTableCellRenderer(requestStatus);
-        requestTable.getColumn("Status").setCellRenderer(statusComboboxRenderer);
-        requestTable.getColumn("Status").setCellEditor(new DefaultCellEditor(statusComboboxRenderer));
+
+        StatusTableCellRenderer statusTableCellRenderer = new StatusTableCellRenderer(requestStatus);
+        requestTable.getColumn("Status").setCellRenderer(textRenderer);
+        requestTable.getColumn("Status").setCellEditor(new DefaultCellEditor(statusTableCellRenderer));
         requestTable.setRowHeight(50);
         JScrollPane scrollPane = new JScrollPane(requestTable);
         centerJPanel.add(scrollPane);
@@ -656,9 +663,18 @@ public class ReexamineFragment extends JPanel implements Fragment {
     }
 
     private List<ReexamineRequest> fetchReexamineRequests(Session session, Reexamine reexamine) {
-        Query<ReexamineRequest> query = session
-                .createQuery("select r from ReexamineRequest r where r.reexamine = :Reexamine", ReexamineRequest.class);
-        query.setParameter("Reexamine", reexamine);
+        Query<ReexamineRequest> query = null;
+        if (user.getPermission().equals(Permission.ADMIN)) {
+            query = session.createQuery("select r from ReexamineRequest r where r.reexamine = :Reexamine",
+                    ReexamineRequest.class);
+            query.setParameter("Reexamine", reexamine);
+        } else {
+            query = session.createQuery(
+                    "select r from ReexamineRequest r where r.reexamine = :Reexamine and r.registration.student = :Student",
+                    ReexamineRequest.class);
+            query.setParameter("Reexamine", reexamine);
+            query.setParameter("Student", user.getStudent());
+        }
         return query.list();
     }
 

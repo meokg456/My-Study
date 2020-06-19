@@ -8,6 +8,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 
+import mystudy.Colors.Colors;
 import mystudy.Enum.RequestStatus;
 import mystudy.Fonts.Fonts;
 
@@ -22,6 +23,8 @@ public class StatusTableCellRenderer extends JComboBox<RequestStatus> implements
         super(statusComboBox);
         ComboBoxRenderer renderer = new ComboBoxRenderer();
         setFont(new Font(Fonts.getFont().getName(), Font.PLAIN, 24));
+        setForeground(Colors.getTextColor());
+        setBackground(Colors.getPrimary());
         setRenderer(renderer);
     }
 
@@ -30,7 +33,7 @@ public class StatusTableCellRenderer extends JComboBox<RequestStatus> implements
             int row, int column) {
         if (isSelected) {
             setForeground(table.getSelectionForeground());
-            super.setBackground(table.getSelectionBackground());
+            setBackground(table.getSelectionBackground());
         } else {
             setForeground(table.getForeground());
             setBackground(table.getBackground());

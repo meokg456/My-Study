@@ -1,14 +1,12 @@
 package mystudy.Components.ComboBox;
 
 import java.awt.Component;
-import java.awt.Font;
 
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 import mystudy.Colors.Colors;
-import mystudy.Fonts.Fonts;
 
 public class ComboBoxRenderer extends JLabel implements ListCellRenderer<Object> {
     /**

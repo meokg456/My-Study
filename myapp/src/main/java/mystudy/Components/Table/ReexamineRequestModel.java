@@ -49,8 +49,8 @@ public class ReexamineRequestModel extends AbstractTableModel {
         ReexamineRequest request = requests.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                return sdf.format(request.getRequestTime());
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                return simpleDateFormat.format(request.getRequestTime());
             case 1:
                 return request.getRegistration().getStudent().getStudentId();
             case 2:
@@ -67,17 +67,19 @@ public class ReexamineRequestModel extends AbstractTableModel {
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         if (columnIndex == 4) {
             RequestStatus status = (RequestStatus) aValue;
-            requests.get(rowIndex).setStatus(status);
+            ReexamineRequest request = requests.get(rowIndex);
+            request.setStatus(status);
             Session session = DatabaseService.getInstance().getSession();
             Transaction transaction = null;
             try {
                 transaction = session.beginTransaction();
-                session.update(requests.get(rowIndex));
+                session.update(request);
                 transaction.commit();
             } catch (HibernateException ex) {
                 transaction.rollback();
                 ex.printStackTrace();
             }
+            fireTableCellUpdated(rowIndex, columnIndex);
         }
 
     }
