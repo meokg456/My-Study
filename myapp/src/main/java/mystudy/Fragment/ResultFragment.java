@@ -33,6 +33,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.text.JTextComponent;
@@ -270,13 +271,15 @@ public class ResultFragment extends JPanel implements Fragment {
                 public void mouseReleased(MouseEvent e) {
                     super.mouseReleased(e);
                     JFileChooser fileChooser = new JFileChooser();
+                    fileChooser.setFileFilter(new FileNameExtensionFilter("CSV file", "csv"));
                     if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                         File file = fileChooser.getSelectedFile();
 
                         try {
                             FileReader fileReader = new FileReader(file);
                             BufferedReader reader = new BufferedReader(fileReader);
-                            String line = reader.readLine().split(",")[0].replace("\uFEFF", "");
+                            String line = reader.readLine().split(",")[0].replaceAll("[^\\P{L}\\P{N}-–]", "")
+                                    .replace("\uFEFF", "");
                             String[] args = line.split("[-–]");
                             System.out.println(args.length);
                             System.out.println(args[0]);
