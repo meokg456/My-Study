@@ -58,34 +58,32 @@ public class DashboardScreen implements Screen, MouseInputListener {
         ResultFragment resultFragment = new ResultFragment();
         ReexamineFragment reexamineFragment = new ReexamineFragment();
         // Tạo nút tab
-        TabItem accountTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/user.png"), "Account");
+        ClassLoader loader = this.getClass().getClassLoader();
+        TabItem accountTabItem = new TabItem(new ImageIcon(loader.getResource("Icons/user.png")), "Account");
         accountTabItem.addMouseListener(this);
         accountTabItem.setMaximumSize(new Dimension(390, 50));
 
-        TabItem studentsTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/student.png"),
-                "Student");
+        TabItem studentsTabItem = new TabItem(new ImageIcon(loader.getResource("Icons/student.png")), "Student");
         studentsTabItem.addMouseListener(this);
         studentsTabItem.setMaximumSize(new Dimension(390, 50));
 
-        TabItem usersTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/team.png"), "User");
+        TabItem usersTabItem = new TabItem(new ImageIcon(loader.getResource("Icons/team.png")), "User");
         usersTabItem.addMouseListener(this);
         usersTabItem.setMaximumSize(new Dimension(390, 50));
 
-        TabItem timeTableTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/calendar.png"),
-                "Time table");
+        TabItem timeTableTabItem = new TabItem(new ImageIcon(loader.getResource("Icons/calendar.png")), "Time table");
         timeTableTabItem.addMouseListener(this);
         timeTableTabItem.setMaximumSize(new Dimension(390, 50));
 
-        TabItem courseTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/book.png"), "Course");
+        TabItem courseTabItem = new TabItem(new ImageIcon(loader.getResource("Icons/book.png")), "Course");
         courseTabItem.addMouseListener(this);
         courseTabItem.setMaximumSize(new Dimension(390, 50));
 
-        TabItem resultTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/result.png"), "Result");
+        TabItem resultTabItem = new TabItem(new ImageIcon(loader.getResource("Icons/result.png")), "Result");
         resultTabItem.addMouseListener(this);
         resultTabItem.setMaximumSize(new Dimension(390, 50));
 
-        TabItem reexamineTabItem = new TabItem(new ImageIcon("myapp/src/main/java/mystudy/Icons/reexamine.png"),
-                "Reexamine");
+        TabItem reexamineTabItem = new TabItem(new ImageIcon(loader.getResource("Icons/reexamine.png")), "Reexamine");
         reexamineTabItem.addMouseListener(this);
         reexamineTabItem.setMaximumSize(new Dimension(390, 50));
         // Tạo các tab tùy theo quyền user

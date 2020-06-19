@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-
+//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-
+3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/QuanLySinhVien?autoReconnect&amp;useUnicode=true&amp;characterEncoding=UTF-8</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">077874036</property>
+        <mapping class="mystudy.POJOs.User" />
+        <mapping class="mystudy.POJOs.Student" />
+        <mapping class="mystudy.POJOs.Class" />
+        <mapping class="mystudy.POJOs.TimeTable" />
+        <mapping class="mystudy.POJOs.Course" />
+        <mapping class="mystudy.POJOs.Registration" />
+        <mapping class="mystudy.POJOs.Result" />
+        <mapping class="mystudy.POJOs.Reexamine" />
+        <mapping class="mystudy.POJOs.ReexamineRequest" />
+    </session-factory>
+</hibernate-configuration>

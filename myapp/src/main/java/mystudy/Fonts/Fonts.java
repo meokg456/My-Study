@@ -11,7 +11,7 @@ public class Fonts {
         try {
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(Font.createFont(Font.TRUETYPE_FONT,
-                    new File("myapp/src/main/java/mystudy/Fonts/Lora/Lora-VariableFont_wght.ttf")));
+                    Fonts.class.getClassLoader().getResourceAsStream("Fonts/Lora/Lora-VariableFont_wght.ttf")));
 
             font = new Font("Lora Regular", Font.PLAIN, 20);
         } catch (FontFormatException | IOException e) {

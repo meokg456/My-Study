@@ -5,7 +5,6 @@ import java.awt.Font;
 
 import javax.swing.JComboBox;
 import javax.swing.JTable;
-import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 
 import mystudy.Colors.Colors;
