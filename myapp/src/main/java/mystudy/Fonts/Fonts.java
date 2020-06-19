@@ -1,7 +1,8 @@
 package mystudy.Fonts;
 
-import java.awt.*;
-import java.io.File;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 
 public class Fonts {
